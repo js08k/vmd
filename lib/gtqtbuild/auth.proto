@@ -1,0 +1,38 @@
+/*
+ * File Name: auth.proto
+ *      Contains IDL messages involved with connection and authentication with
+ *      a peer client as well as maintaining connections.
+ */
+
+package proto;
+
+enum NetPingType
+{
+    Request = 0;
+    Reply = 1;
+}
+
+// Used to inspect the delay in the network connection.
+message NetPing
+{
+    // Type (0 is ping request, 1 is ping reply)
+    optional NetPingType type = 2;
+
+    // NetPing payload, a comparable and unique set of data
+    optional bytes report = 1;
+}
+
+message PeerInformation
+{
+    // UUID of the client
+    optional bytes id = 1;
+
+    // Self identifying Username
+    optional bytes username = 2;
+}
+
+message MediaData
+{
+    // 1kB of (encrypted) media data
+    optional bytes data = 1;
+}
