@@ -1,3 +1,3 @@
 [submodule "gtqt"]
 	path = gtqt
-	url = git://github.com/js08k/protoc2qt.git
+	url = git://github.com/js08k/gtqt.git
