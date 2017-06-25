@@ -27,36 +27,23 @@ public:
     virtual bool seek(qint64 pos);
     virtual qint64 size() const;
 
-
-//    virtual qint64 read(char *data, qint64 maxSize);
-
-//    virtual QByteArray read(char *data, qint64 maxSize);
-
 public slots:
     void stream(QByteArray const&,dvd::StreamAction);
 
 signals:
-    void pausePlayback() const;
-    void resumePlayback() const;
+    void ready() const;
     void pauseReadStream() const;
     void resumeReadStream() const;
 
-private slots:
-    void loop();
-
 protected:
     virtual qint64 readData(char* data, qint64 maxSize);
-
     virtual qint64 writeData(char const*, qint64);
-
-//    virtual bool open(QIODevice::OpenMode)
-//    { return false; }
 
 private:
     int const m_minbuffered;
     int const m_maxbuffered;
     QByteArray m_data;
-    QTimer* m_loop;
+    bool m_ready;
 };
 
 #endif // STREAMBUFFER_H

@@ -23,18 +23,18 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 
 SOURCES += \
-        main.cpp \
-        DvDPlayer.cpp \
+    main.cpp \
+    DvDPlayer.cpp \
     MediaScreen.cpp \
     qmediaplayerspy.cpp
 
 HEADERS += \
-        DvDPlayer.h \
+    DvDPlayer.h \
     MediaScreen.h \
     qmediaplayerspy.h
 
 FORMS += \
-        DvDPlayer.ui
+    DvDPlayer.ui
 
 INCLUDEPATH += \
     ../../include \

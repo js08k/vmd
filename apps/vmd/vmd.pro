@@ -34,9 +34,11 @@ LIBS += \
     -L/usr/local/protobuf/lib \
     -lprotobuf \
     -L$$OUT_PWD/../../lib/gtqtbuild -lgtqt \
-    -L../../lib/dvd -ldvd
+    -L../../lib/dvd -ldvd \
+    -L/usr/local/libdvdcss/lib -ldvdcss
 
-SOURCES += main.cpp \
+SOURCES += \
+    main.cpp \
     vmd.cpp \
     netinspector.cpp
 

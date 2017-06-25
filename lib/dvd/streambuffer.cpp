@@ -8,11 +8,9 @@ StreamBuffer::StreamBuffer(QObject* parent)
     : QIODevice(parent)
     , m_minbuffered(1024*1024)
     , m_maxbuffered(m_minbuffered*2)
-    , m_loop( new QTimer(this) )
+    , m_ready(false)
 {
     open( QIODevice::ReadWrite );
-    connect( m_loop, SIGNAL(timeout()), this, SLOT(loop()) );
-    m_loop->start(10);
 }
 
 StreamBuffer::StreamBuffer(QByteArray const& other, QObject* parent)
@@ -20,11 +18,9 @@ StreamBuffer::StreamBuffer(QByteArray const& other, QObject* parent)
     , m_minbuffered(1024*1024)
     , m_maxbuffered(m_minbuffered*2)
     , m_data(other)
-    , m_loop( new QTimer(this) )
+    , m_ready(false)
 {
     open( QIODevice::ReadWrite );
-    connect( m_loop, SIGNAL(timeout()), this, SLOT(loop()) );
-    m_loop->start(10);
 }
 
 StreamBuffer::~StreamBuffer()
@@ -34,13 +30,11 @@ StreamBuffer::~StreamBuffer()
 
 void StreamBuffer::close()
 {
-    std::cout << "StreamBuffer::close()" << std::endl;
     setOpenMode( QIODevice::NotOpen );
 }
 
 bool StreamBuffer::open(OpenMode flags)
 {
-    std::cout << "StreamBuffer::open()" << std::endl;
     setOpenMode(flags);
     return true;
 }
@@ -75,6 +69,16 @@ qint64 StreamBuffer::readData(char *data, qint64 maxSize)
     maxSize = qMin( maxSize, qint64(m_data.length()) );
     memcpy(data, m_data.data(), maxSize );
     m_data = m_data.remove(0, maxSize);
+
+    if ( m_data.length() < (m_maxbuffered+m_minbuffered)/2 )
+    {
+        emit resumeReadStream();
+    }
+    else if ( m_data.isEmpty() )
+    {
+        m_ready = false;
+    }
+
     return maxSize;
 }
 
@@ -99,26 +103,15 @@ void StreamBuffer::stream(QByteArray const& data, dvd::StreamAction action)
             break;
         }
 
-        bool isPlayable( size() > m_minbuffered );
-
-        // Control the playback based on buffered data
-        if ( !isPlayable && m_data.size() > m_minbuffered )
+        // Control the reading (input stream)
+        if ( m_data.length() > m_maxbuffered )
         {
-            std::cout << "StreamBuffer: Resume playback" << std::endl;
-            emit resumePlayback();
+            emit pauseReadStream();
         }
-        else if ( m_data.size() < m_minbuffered )
+        else if ( size() > m_minbuffered && !m_ready )
         {
-            std::cout << "StreamBuffer: Pausing playback" << std::endl;
-            emit pausePlayback();
+            m_ready = true;
+            emit ready();
         }
     }
-}
-
-void StreamBuffer::loop()
-{
-    if ( m_data.length() > m_maxbuffered )
-        emit pauseReadStream();
-    else if ( m_data.length() < (m_maxbuffered+m_minbuffered)/2 )
-        emit resumeReadStream();
 }

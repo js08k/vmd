@@ -5,10 +5,14 @@
 #include <QSettings>
 
 #include "datapackage.h"
+#include "dvd/dvdcontext.h"
+#include "dvd/streambuffer.h"
 
 namespace Ui { class VMD; }
 namespace gtqt { class PeerLink; }
 class QHostAddress;
+class QThread;
+class QMediaPlayer;
 
 class VMD
         : public QWidget
@@ -28,6 +32,9 @@ private slots:
     void clickPushButtonAdd();
     void clickPushButtonRemove();
     void clickPushButtonLoad();
+    void clickPushButtonPlayPause();
+
+    void mediaStateChanged( dvd::MediaState );
 
     void receive( gtqt::DataPackage<gtqt::ClientType1> const& );
 
@@ -42,6 +49,11 @@ private:
 
     QString const m_addrregexp;
     gtqt::PeerLink* m_link;
+
+    QThread* m_mediaThread;
+    DvDContext* m_mediaContext;
+    QMediaPlayer* m_player;
+    StreamBuffer m_buffer;
 };
 
 #endif // VMD_H

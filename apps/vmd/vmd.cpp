@@ -9,6 +9,9 @@
 #include <QPalette>
 #include <QFileDialog>
 #include <QListWidgetItem>
+#include <QThread>
+#include <QMediaPlayer>
+#include <QTimer>
 
 #include <iostream>
 #include <message.h>
@@ -18,9 +21,33 @@ VMD::VMD(QWidget *parent)
     , ui(new Ui::VMD)
     , m_addrregexp("^(\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}):(\\d+)$")
     , m_link( new gtqt::PeerLink(this) )
+    , m_mediaThread( new QThread )
+    , m_mediaContext( new DvDContext() )
+    , m_player(0)
 {
-    m_settings.beginGroup("gui");
+    // Setup the Ui
     ui->setupUi(this);
+
+    // Move the MediaContext to a thread, and start the thread
+//    m_mediaContext->moveToThread(m_mediaThread);
+//    m_mediaThread->start();
+
+    connect( &m_buffer, SIGNAL(pauseReadStream()), m_mediaContext, SLOT(pause()) );
+    connect( &m_buffer, SIGNAL(resumeReadStream()), m_mediaContext, SLOT(resume()) );
+    connect( m_mediaContext, SIGNAL(stream(QByteArray,dvd::StreamAction)),
+             &m_buffer, SLOT(stream(QByteArray,dvd::StreamAction)) );
+
+    connect( m_mediaContext, SIGNAL(mediaStateChanged(dvd::MediaState)),
+             this, SLOT(mediaStateChanged(dvd::MediaState)) );
+
+    connect( ui->widgetVideo, SIGNAL(highlight(MenuButton)),
+             m_mediaContext, SLOT(highlight(MenuButton)) );
+    connect( ui->widgetVideo, SIGNAL(activate(MenuButton)),
+             m_mediaContext, SLOT(activate(MenuButton)) );
+    connect( m_mediaContext, SIGNAL(buttons(QList<MenuButton>)),
+             ui->widgetVideo, SLOT(buttons(QList<MenuButton>)) );
+
+    m_settings.beginGroup("gui");
 
     // Restore Username
     ui->lineEditUserName->
@@ -59,6 +86,8 @@ VMD::VMD(QWidget *parent)
              this, SLOT(clickPushButtonRemove()) );
     connect( ui->pushButtonLoad, SIGNAL(clicked()),
              this, SLOT(clickPushButtonLoad()) );
+    connect( ui->pushButtonPausePlay, SIGNAL(clicked()),
+             this, SLOT(clickPushButtonPlayPause()) );
 
     connect( m_link, SIGNAL(receive(gtqt::DataPackage<gtqt::ClientType1>)),
            this, SLOT(receive(gtqt::DataPackage<gtqt::ClientType1>)) );
@@ -77,6 +106,13 @@ VMD::VMD(QWidget *parent)
 
 VMD::~VMD()
 {
+
+    // Stop the media thread and wait for the thread to join
+    m_mediaContext->deleteLater();
+//    m_mediaThread->quit();
+//    m_mediaThread->wait();
+    delete m_mediaThread;
+
     delete ui;
     m_settings.sync();
 }
@@ -169,7 +205,7 @@ void VMD::lineEditPeerAddressFinished()
     static QString const msg( "Saved %1: \'%2\'" );
     std::cout << msg.arg( key, value ).toStdString() << std::endl;
 }
-#include <QTimer>
+
 void VMD::clickPushButtonConnect()
 {
     QString const value( ui->lineEditPeerAddress->text() );
@@ -220,9 +256,7 @@ void VMD::clickPushButtonRemove()
     if ( items.empty() ) { return; }
 
     foreach ( QListWidgetItem* item, items )
-    {
-        delete item;
-    }
+    {   delete item; }
 
     QStringList list;
     for ( int i(0); i < ui->listWidgetLibrary->count(); ++i )
@@ -237,7 +271,64 @@ void VMD::clickPushButtonRemove()
 
 void VMD::clickPushButtonLoad()
 {
+    QList<QListWidgetItem*> items(ui->listWidgetLibrary->selectedItems());
+    if ( items.empty() ) { return; }
+
+    m_mediaContext->open( items.first()->text() );
+    ui->pushButtonPausePlay->setText("Pause");
+
+    if ( m_player )
+    { delete m_player; }
+
+    m_player = new QMediaPlayer(this);
+    m_player->setMedia( QMediaContent(), &m_buffer );
+    m_player->setVideoOutput(ui->widgetVideo);
+    connect( &m_buffer, SIGNAL(ready()), m_player, SLOT(play()) );
+
     ui->tabWidgetMain->setCurrentIndex(0);
+}
+
+void VMD::clickPushButtonPlayPause()
+{
+    QString const text( ui->pushButtonPausePlay->text() );
+
+    if ( text == "Play" )
+    {
+        if ( m_player )
+            m_player->play();
+
+        ui->pushButtonPausePlay->setText("Pause");
+    }
+    else if ( text == "Pause" )
+    {
+        if ( m_player )
+            m_player->pause();
+
+        ui->pushButtonPausePlay->setText("Play");
+    }
+    else
+    {
+        ui->pushButtonPausePlay->setText("Play");
+    }
+}
+
+void VMD::mediaStateChanged( dvd::MediaState state )
+{
+    switch ( state )
+    {
+    case dvd::MediaNotAvailable:
+        ui->labelMediaStatus->setText("Not Available");
+        break;
+    case dvd::MediaLoading:
+        ui->labelMediaStatus->setText("Loading");
+        break;
+    case dvd::MediaIdle:
+        ui->labelMediaStatus->setText("Idle");
+        break;
+    case dvd::MediaReading:
+        ui->labelMediaStatus->setText("Reading");
+        break;
+    }
 }
 
 void VMD::receive( gtqt::DataPackage<gtqt::ClientType1> const& msg )

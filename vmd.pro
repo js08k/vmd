@@ -11,10 +11,14 @@ TEMPLATE = subdirs
 SUBDIRS += \
     gtqt \
     apps \
-    lib
+    lib \
+    #installer
 
 lib.depends = gtqt
 lib.subdir = lib
 
 apps.depends = gtqt lib
 apps.subdir = apps
+
+installer.depends = apps
+installer.subdir = installer
