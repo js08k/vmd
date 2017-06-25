@@ -6,22 +6,6 @@
 
 package proto;
 
-enum NetPingType
-{
-    Request = 0;
-    Reply = 1;
-}
-
-// Used to inspect the delay in the network connection.
-message NetPing
-{
-    // Type (0 is ping request, 1 is ping reply)
-    optional NetPingType type = 2;
-
-    // NetPing payload, a comparable and unique set of data
-    optional bytes report = 1;
-}
-
 message PeerInformation
 {
     // UUID of the client
@@ -31,8 +15,76 @@ message PeerInformation
     optional bytes username = 2;
 }
 
-message MediaData
+// Used to inspect the delay in the network connection.
+message NetPing
 {
+    enum Type
+    {
+        Request = 0;
+        Reply = 1;
+    }
+
+    // Type (0 is ping request, 1 is ping reply)
+    optional Type type = 1;
+
+    // NetPing payload, a comparable and unique set of data
+    optional bytes report = 2;
+}
+
+// Message used to control the stream and the stream playback
+message StreamRequest
+{
+    enum Action
+    {
+        // Request the MediaInfo from the host
+        SendInfo = 1;
+
+        // Request the host pause sending media
+        PauseStream = 2;
+
+        // Request the host resume sending media
+        ResumeStream = 3;
+
+        // Request the host/peer pause the playback of the stream
+        PausePlayback = 4;
+
+        // Request teh host/peer resume the playback of the stream
+        ResumePlayback = 5;
+    }
+
+    // Action
+    optional Action action = 1;
+}
+
+message MediaInfo
+{
+    // Null terminated string, Stream Title
+    optional bytes title = 1;
+
+    // Encryption/Decription Key
+    optional bytes key = 2;
+}
+
+
+message MediaFrame
+{
+    enum FrameAction
+    {
+        Append = 0;
+        Flush = 1;
+        DecryptAppend = 2;
+        DecryptFlush = 3;
+    }
+
+    // Action of what to do with the frame
+    optional FrameAction action = 1;
+
+    enum MessageConstants
+    {
+        // Maximum amount of data that should be expected within data
+        MaxFrameSize = 1024;
+    }
+
     // 1kB of (encrypted) media data
-    optional bytes data = 1;
+    optional bytes data = 2;
 }

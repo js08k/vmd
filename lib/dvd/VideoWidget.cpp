@@ -22,19 +22,19 @@ VideoWidget::~VideoWidget()
 
 void VideoWidget::buttons( QList<MenuButton> const& buttons )
 {
-    std::cout << "Got " << buttons.length() << " buttons!" << std::endl;
+//    std::cout << "Got " << buttons.length() << " buttons!" << std::endl;
     m_buttons = buttons;
     update();
 }
 
 void VideoWidget::mouseMoveEvent( QMouseEvent* event )
 {
-    std::cout << "MouseTracking: " << testAttribute(Qt::WA_MouseTracking) << std::endl;
+//    std::cout << "MouseTracking: " << testAttribute(Qt::WA_MouseTracking) << std::endl;
     QWidget::mouseMoveEvent(event);
 
-    std::cout << "VideoWidget: mouseMoveEvent ("
-              << event->x() << "," << event->y()
-              << ")" <<std::endl;
+//    std::cout << "VideoWidget: mouseMoveEvent ("
+//              << event->x() << "," << event->y()
+//              << ")" <<std::endl;
 }
 
 void VideoWidget::mousePressEvent( QMouseEvent* e )

@@ -1,12 +1,10 @@
 #include "dvd/streambuffer.h"
 #include <QtGlobal>
 #include <QTimer>
-#include <iostream>
-#include <cmath>
 
 StreamBuffer::StreamBuffer(QObject* parent)
     : QIODevice(parent)
-    , m_minbuffered(1024*1024)
+    , m_minbuffered(1024*1024*4)
     , m_maxbuffered(m_minbuffered*2)
     , m_ready(false)
 {
@@ -41,26 +39,22 @@ bool StreamBuffer::open(OpenMode flags)
 
 qint64 StreamBuffer::pos() const
 {
-//    std::cout << "StreamBuffer::pos()" << std::endl;
     return 0;
 }
 
 qint64 StreamBuffer::bytesAvailable() const
 {
-//    std::cout << "StreamBuffer::bytesAvailable()" << std::endl;
     return m_data.size();
 }
 
 bool StreamBuffer::seek(qint64 pos)
 {
     QIODevice::seek(pos);
-//    std::cout << "StreamBuffer::seek(" << pos << ")" << std::endl;
     return false;
 }
 
 qint64 StreamBuffer::size() const
 {
-//    std::cout << "StreamBuffer::size()" << std::endl;
     return m_data.size();
 }
 
@@ -98,6 +92,7 @@ void StreamBuffer::stream(QByteArray const& data, dvd::StreamAction action)
             write(data);
             break;
         case dvd::FlushStream:
+            m_ready = false;
             m_data.clear();
             write(data);
             break;

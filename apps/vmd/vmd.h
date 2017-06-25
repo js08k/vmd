@@ -14,6 +14,8 @@ class QHostAddress;
 class QThread;
 class QMediaPlayer;
 
+namespace dvd { class StreamPlayer; }
+
 class VMD
         : public QWidget
 {
@@ -34,7 +36,7 @@ private slots:
     void clickPushButtonLoad();
     void clickPushButtonPlayPause();
 
-    void mediaStateChanged( dvd::MediaState );
+    void setTitle( QString const& title );
 
     void receive( gtqt::DataPackage<gtqt::ClientType1> const& );
 
@@ -52,8 +54,9 @@ private:
 
     QThread* m_mediaThread;
     DvDContext* m_mediaContext;
-    QMediaPlayer* m_player;
-    StreamBuffer m_buffer;
+//    QMediaPlayer* m_player;
+//    StreamBuffer m_buffer;
+    dvd::StreamPlayer* m_player;
 };
 
 #endif // VMD_H

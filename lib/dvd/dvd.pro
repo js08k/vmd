@@ -28,7 +28,8 @@ SOURCES += \
     mpegcontext.cpp \
     streambuffer.cpp \
     VideoWidget.cpp \
-    menubutton.cpp
+    menubutton.cpp \
+    streamplayer.cpp
 
 HEADERS += \
     ../../include/dvd/dvd_global.h \
@@ -36,7 +37,8 @@ HEADERS += \
     ../../include/dvd/mpegcontext.h \
     ../../include/dvd/streambuffer.h \
     ../../include/dvd/VideoWidget.h \
-    ../../include/dvd/menubutton.h
+    ../../include/dvd/menubutton.h \
+    ../../include/dvd/streamplayer.h
 
 unix {
     target.path = /usr/lib

@@ -24,7 +24,7 @@ void NetInspector::measure()
 
     // Build the report and transmit
     gtqt::DataPackage<gtqt::NetPing> msg;
-    msg.data()->set_type( proto::Request );
+    msg.data()->set_type( proto::NetPing::Request );
     msg.data()->set_report( bytes.data(), bytes.length() );
     emit publish(msg);
 
@@ -58,9 +58,9 @@ void NetInspector::cleanup()
 
 void NetInspector::receive( gtqt::DataPackage<gtqt::NetPing> msg )
 {
-    if ( msg->type() == proto::Request )
+    if ( msg->type() == proto::NetPing::Request )
     {
-        msg.data()->set_type( proto::Reply );
+        msg.data()->set_type( proto::NetPing::Reply );
         emit publish(msg);
     }
     else

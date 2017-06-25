@@ -35,20 +35,14 @@ int MenuButton::index() const
 {
     return m_index;
 }
-#include <iostream>
+
 QRectF MenuButton::mapToScreen(QSizeF const& screen) const
 {
     qreal const xscale( screen.width() / m_resolution.width() );
     qreal const yscale( screen.height() / m_resolution.height() );
 
-    std::cout << m_button.left() << "," << m_button.right() << " "
-              << m_button.width() << "x" << m_button.height() << std::endl;
     return QRectF( m_button.left()*xscale, m_button.top()*yscale,
                    m_button.width()*xscale, m_button.height()*yscale );
-
-    // mirrored on the y axis
-//    return QRectF( m_button.left()*xscale, m_button.bottom()*yscale,
-//                   m_button.width()*xscale, m_button.height()*yscale );
 }
 
 void MenuButton::setResolution(const QSizeF &resolution)

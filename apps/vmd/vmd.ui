@@ -55,13 +55,6 @@
         <number>2</number>
        </property>
        <item>
-        <widget class="QLabel" name="labelMediaStatus">
-         <property name="text">
-          <string>Status</string>
-         </property>
-        </widget>
-       </item>
-       <item>
         <widget class="VideoWidget" name="widgetVideo" native="true">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Preferred" vsizetype="Expanding">

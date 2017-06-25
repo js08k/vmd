@@ -5,6 +5,7 @@
 
 // libDvDNav Includes
 #include <dvdnav/dvdnav.h>
+#include <dvdread/dvd_reader.h>
 
 // Qt Includes
 #include <QTimer>
@@ -16,6 +17,7 @@
 DvDContext::DvDContext(QObject* parent)
     : QObject(parent)
     , m_handle(0)
+    , m_title("UNKNOWN")
     , m_loop(new QTimer(this))
     , m_mediaState(dvd::MediaNotAvailable)
     , m_nextStreamAction(dvd::AppendStream)
@@ -52,6 +54,22 @@ bool DvDContext::open( QString const& device )
     setMediaState(dvd::MediaLoading);
     bool opresult(false);
 
+    dvd_reader_t* reader( DVDOpen(qPrintable(device)) );
+    if ( reader )
+    {
+        char volid[32];
+
+        if ( DVDUDFVolumeInfo(reader,volid,32,0,0) == 0 )
+            m_title = QString(volid);
+        else if ( DVDISOVolumeInfo(reader,volid,32,0,0) == 0 )
+            m_title = QString(volid);
+
+        DVDClose(reader);
+    }
+
+    std::cout << "Loading " << m_title.toStdString() << std::endl;
+    emit title( m_title );
+
     if ( m_handle )
     {
         dvdnav_close(m_handle);
@@ -65,13 +83,9 @@ bool DvDContext::open( QString const& device )
     }
 
     if ( opresult )
-    {
         resume();
-    }
     else
-    {
         setMediaState(dvd::MediaNotAvailable);
-    }
 
     return opresult;
 }
@@ -161,7 +175,10 @@ void DvDContext::loop()
         case DVDNAV_SPU_STREAM_CHANGE:
             break;
         case DVDNAV_HIGHLIGHT:
-            std::cout << "++++++Highlight++++++" << std::endl;
+        {
+            dvdnav_highlight_event_t* e = (dvdnav_highlight_event_t*)buffer;
+            std::cout << "++++++Highlight " << e->buttonN << "++++++" << std::endl;
+        }
             break;
         case DVDNAV_VTS_CHANGE:
             break;
@@ -230,7 +247,7 @@ void DvDContext::loop()
 
                 if ( btncnt > 0 )
                 {
-                    std::cout << "Waiting for a button selection..." << std::endl;
+//                    std::cout << "Waiting for a button selection..." << std::endl;
 //                    m_loop->stop();
                 }
             }
@@ -272,7 +289,7 @@ void DvDContext::highlight( MenuButton const& btn )
 
         if ( pci )
         {
-            dvdnav_button_select(m_handle,pci,index);
+            dvdnav_button_select(m_handle,pci,index+1);
         }
     }
 }
@@ -289,8 +306,8 @@ void DvDContext::activate( MenuButton const& btn )
 
         if ( pci )
         {
-            std::cout << "+++++++Activating " << index << "+++++++" << std::endl;
-            dvdnav_button_select_and_activate(m_handle,pci,index);
+            std::cout << "+++++++Activating " << index+1 << "+++++++" << std::endl;
+            dvdnav_button_select_and_activate(m_handle,pci,index+1);
         }
     }
 }

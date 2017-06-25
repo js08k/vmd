@@ -40,6 +40,7 @@ public:
     QSizeF resolution() const;
 
 signals:
+    void title( QString const& ) const;
     // Signal for streaming data, when flush is set flush any previously
     // buffered data
     void stream( QByteArray const& data, dvd::StreamAction action ) const;
@@ -62,6 +63,7 @@ private:
 
 private:
     dvdnav_t* m_handle;
+    QString m_title;
     QTimer* m_loop;
     QList<MenuButton> m_buttons;
 

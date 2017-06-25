@@ -32,13 +32,10 @@ VMD::VMD(QWidget *parent)
 //    m_mediaContext->moveToThread(m_mediaThread);
 //    m_mediaThread->start();
 
-    connect( &m_buffer, SIGNAL(pauseReadStream()), m_mediaContext, SLOT(pause()) );
-    connect( &m_buffer, SIGNAL(resumeReadStream()), m_mediaContext, SLOT(resume()) );
-    connect( m_mediaContext, SIGNAL(stream(QByteArray,dvd::StreamAction)),
-             &m_buffer, SLOT(stream(QByteArray,dvd::StreamAction)) );
-
-    connect( m_mediaContext, SIGNAL(mediaStateChanged(dvd::MediaState)),
-             this, SLOT(mediaStateChanged(dvd::MediaState)) );
+//    connect( &m_buffer, SIGNAL(pauseReadStream()), m_mediaContext, SLOT(pause()) );
+//    connect( &m_buffer, SIGNAL(resumeReadStream()), m_mediaContext, SLOT(resume()) );
+//    connect( m_mediaContext, SIGNAL(stream(QByteArray,dvd::StreamAction)),
+//             &m_buffer, SLOT(stream(QByteArray,dvd::StreamAction)) );
 
     connect( ui->widgetVideo, SIGNAL(highlight(MenuButton)),
              m_mediaContext, SLOT(highlight(MenuButton)) );
@@ -46,6 +43,8 @@ VMD::VMD(QWidget *parent)
              m_mediaContext, SLOT(activate(MenuButton)) );
     connect( m_mediaContext, SIGNAL(buttons(QList<MenuButton>)),
              ui->widgetVideo, SLOT(buttons(QList<MenuButton>)) );
+    connect( m_mediaContext, SIGNAL(title(QString)),
+             this, SLOT(setTitle(QString)) );
 
     m_settings.beginGroup("gui");
 
@@ -268,7 +267,7 @@ void VMD::clickPushButtonRemove()
 
     m_settings.setValue("listWidgetLibrary", list);
 }
-
+#include "dvd/streamplayer.h"
 void VMD::clickPushButtonLoad()
 {
     QList<QListWidgetItem*> items(ui->listWidgetLibrary->selectedItems());
@@ -280,10 +279,18 @@ void VMD::clickPushButtonLoad()
     if ( m_player )
     { delete m_player; }
 
-    m_player = new QMediaPlayer(this);
-    m_player->setMedia( QMediaContent(), &m_buffer );
+    m_player = new dvd::StreamPlayer(this);
     m_player->setVideoOutput(ui->widgetVideo);
-    connect( &m_buffer, SIGNAL(ready()), m_player, SLOT(play()) );
+
+    connect( m_player, SIGNAL(pauseReadStream()), m_mediaContext, SLOT(pause()) );
+    connect( m_player, SIGNAL(resumeReadStream()), m_mediaContext, SLOT(resume()) );
+    connect( m_mediaContext, SIGNAL(stream(QByteArray,dvd::StreamAction)),
+             m_player, SLOT(stream(QByteArray,dvd::StreamAction)) );
+
+//    m_player = new QMediaPlayer(this, QMediaPlayer::StreamPlayback );
+//    m_player->setMedia( QMediaContent(), &m_buffer );
+//    m_player->setVideoOutput(ui->widgetVideo);
+//    connect( &m_buffer, SIGNAL(ready()), m_player, SLOT(play()) );
 
     ui->tabWidgetMain->setCurrentIndex(0);
 }
@@ -312,23 +319,9 @@ void VMD::clickPushButtonPlayPause()
     }
 }
 
-void VMD::mediaStateChanged( dvd::MediaState state )
+void VMD::setTitle( QString const& title )
 {
-    switch ( state )
-    {
-    case dvd::MediaNotAvailable:
-        ui->labelMediaStatus->setText("Not Available");
-        break;
-    case dvd::MediaLoading:
-        ui->labelMediaStatus->setText("Loading");
-        break;
-    case dvd::MediaIdle:
-        ui->labelMediaStatus->setText("Idle");
-        break;
-    case dvd::MediaReading:
-        ui->labelMediaStatus->setText("Reading");
-        break;
-    }
+    setWindowTitle(title);
 }
 
 void VMD::receive( gtqt::DataPackage<gtqt::ClientType1> const& msg )
