@@ -1,6 +1,6 @@
 #include "dvd/streamplayer.h"
 #include "dvd/streambuffer.h"
-#include <iostream>
+#include "dvd/MediaFrame.h"
 
 dvd::StreamPlayer::StreamPlayer(QObject *parent)
     : QMediaPlayer( parent, QMediaPlayer::VideoSurface )
@@ -13,18 +13,22 @@ dvd::StreamPlayer::StreamPlayer(QObject *parent)
     connect( m_buffer, SIGNAL(ready()), this, SLOT(ready()) );
 }
 
-void dvd::StreamPlayer::stream(QByteArray const& data, dvd::StreamAction action)
+void dvd::StreamPlayer::stream(dvd::MediaFrame frame)
 {
-    switch ( action )
+    switch ( frame.action() )
     {
-    case dvd::AppendStream:
-        break;
-    case dvd::FlushStream:
+    case gtqt::MediaFrame::DecryptFlush:
+        frame.decrypt( QString() );
+    case gtqt::MediaFrame::Flush:
         stop();
+        m_buffer->stream(QByteArray(frame.data().c_str(),frame.data().length()), dvd::FlushStream );
+        break;
+    case gtqt::MediaFrame::DecryptAppend:
+        frame.decrypt( QString() );
+    case gtqt::MediaFrame::Append:
+        m_buffer->stream(QByteArray(frame.data().c_str(),frame.data().length()), dvd::AppendStream );
         break;
     }
-
-    m_buffer->stream( data, action );
 }
 
 void dvd::StreamPlayer::ready()

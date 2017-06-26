@@ -23,13 +23,22 @@ DEFINES += QT_DEPRECATED_WARNINGS
 # You can also select to disable deprecated APIs only up to a certain version of Qt.
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
+INCLUDEPATH += \
+    ../../include \
+    /usr/local/protobuf/include \
+    $$OUT_PWD/../../lib/gtqtbuild \
+    /usr/local/libdvdcss/include \
+    /usr/local/libdvdnav/include \
+    /usr/local/libdvdread/include
+
 SOURCES += \
-        dvdcontext.cpp \
+    dvdcontext.cpp \
     mpegcontext.cpp \
     streambuffer.cpp \
     VideoWidget.cpp \
     menubutton.cpp \
-    streamplayer.cpp
+    streamplayer.cpp \
+    MediaFrame.cpp
 
 HEADERS += \
     ../../include/dvd/dvd_global.h \
@@ -38,18 +47,13 @@ HEADERS += \
     ../../include/dvd/streambuffer.h \
     ../../include/dvd/VideoWidget.h \
     ../../include/dvd/menubutton.h \
-    ../../include/dvd/streamplayer.h
+    ../../include/dvd/streamplayer.h \
+    ../../include/dvd/MediaFrame.h
 
 unix {
     target.path = /usr/lib
     INSTALLS += target
 }
-
-INCLUDEPATH += \
-    ../../include \
-    /usr/local/libdvdcss/include \
-    /usr/local/libdvdnav/include \
-    /usr/local/libdvdread/include
 
 LIBS += \
     -L/usr/local/libdvdcss/lib -ldvdcss \

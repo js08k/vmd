@@ -29,8 +29,8 @@ VMD::VMD(QWidget *parent)
     ui->setupUi(this);
 
     // Move the MediaContext to a thread, and start the thread
-//    m_mediaContext->moveToThread(m_mediaThread);
-//    m_mediaThread->start();
+    m_mediaContext->moveToThread(m_mediaThread);
+    m_mediaThread->start();
 
 //    connect( &m_buffer, SIGNAL(pauseReadStream()), m_mediaContext, SLOT(pause()) );
 //    connect( &m_buffer, SIGNAL(resumeReadStream()), m_mediaContext, SLOT(resume()) );
@@ -68,6 +68,14 @@ VMD::VMD(QWidget *parent)
     ui->listWidgetLibrary->
             addItems(m_settings.value("listWidgetLibrary").toStringList());
 
+    // Restore the DVD Beginning Title
+    ui->spinBoxStartTitle->
+            setValue(m_settings.value("spinBoxStartTitle").toInt());
+
+    // Restore the DVD Beginning Chapter
+    ui->spinBoxStartChapter->
+            setValue(m_settings.value("spinBoxStartChapter").toInt());
+
     // Connect the Gui slots
     connect( ui->lineEditUserName, SIGNAL(editingFinished()),
              this, SLOT(lineEditUserNameFinished()) );
@@ -77,6 +85,10 @@ VMD::VMD(QWidget *parent)
              this, SLOT(lineEditSimulatedDelayFinished()) );
     connect( ui->lineEditPeerAddress, SIGNAL(editingFinished()),
              this, SLOT(lineEditPeerAddressFinished()) );
+    connect( ui->spinBoxStartTitle, SIGNAL(valueChanged(int)),
+             this, SLOT(dvdStartTitleChanged(int)) );
+    connect( ui->spinBoxStartChapter, SIGNAL(valueChanged(int)),
+             this, SLOT(dvdStartChapterChanged(int)) );
     connect( ui->pushButtonConnect, SIGNAL(clicked()),
              this, SLOT(clickPushButtonConnect()) );
     connect( ui->pushButtonAdd, SIGNAL(clicked()),
@@ -108,8 +120,8 @@ VMD::~VMD()
 
     // Stop the media thread and wait for the thread to join
     m_mediaContext->deleteLater();
-//    m_mediaThread->quit();
-//    m_mediaThread->wait();
+    m_mediaThread->quit();
+    m_mediaThread->wait();
     delete m_mediaThread;
 
     delete ui;
@@ -205,6 +217,16 @@ void VMD::lineEditPeerAddressFinished()
     std::cout << msg.arg( key, value ).toStdString() << std::endl;
 }
 
+void VMD::dvdStartTitleChanged(int value)
+{
+    m_settings.setValue("spinBoxStartTitle", value);
+}
+
+void VMD::dvdStartChapterChanged(int value)
+{
+    m_settings.setValue("spinBoxStartChapter", value);
+}
+
 void VMD::clickPushButtonConnect()
 {
     QString const value( ui->lineEditPeerAddress->text() );
@@ -212,9 +234,6 @@ void VMD::clickPushButtonConnect()
     QRegExp regexp(m_addrregexp);
     if ( regexp.indexIn(value) >= 0 )
     {
-        std::cout << "cap(1): " << regexp.cap(1).toStdString() << std::endl;
-        std::cout << "cap(2): " << regexp.cap(2).toStdString() << std::endl;
-
         QHostAddress const host( regexp.cap(1) );
         quint16 const port( regexp.cap(2).toInt() );
         m_link->connectToHost( host, port );
@@ -284,8 +303,8 @@ void VMD::clickPushButtonLoad()
 
     connect( m_player, SIGNAL(pauseReadStream()), m_mediaContext, SLOT(pause()) );
     connect( m_player, SIGNAL(resumeReadStream()), m_mediaContext, SLOT(resume()) );
-    connect( m_mediaContext, SIGNAL(stream(QByteArray,dvd::StreamAction)),
-             m_player, SLOT(stream(QByteArray,dvd::StreamAction)) );
+    connect( m_mediaContext, SIGNAL(stream(dvd::MediaFrame)),
+             m_player, SLOT(stream(dvd::MediaFrame)) );
 
 //    m_player = new QMediaPlayer(this, QMediaPlayer::StreamPlayback );
 //    m_player->setMedia( QMediaContent(), &m_buffer );

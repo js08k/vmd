@@ -28,6 +28,8 @@ namespace dvd
     };
 }
 
+namespace dvd { class MediaFrame; }
+
 class DVDSHARED_EXPORT DvDContext
         : public QObject
 {
@@ -37,10 +39,12 @@ public:
     DvDContext(QObject* parent = 0);
     virtual ~DvDContext();
     bool open( QString const& device );
-    QSizeF resolution() const;
 
 signals:
     void title( QString const& ) const;
+    void stream( dvd::MediaFrame const& frame ) const;
+    void resolution( QSizeF const& ) const;
+
     // Signal for streaming data, when flush is set flush any previously
     // buffered data
     void stream( QByteArray const& data, dvd::StreamAction action ) const;
@@ -55,8 +59,6 @@ public slots:
 
 private slots:
     void loop();
-    void navToTitle1();
-    void showResolution();
 
 private:
     void setMediaState( dvd::MediaState state );
@@ -68,7 +70,8 @@ private:
     QList<MenuButton> m_buttons;
 
     dvd::MediaState m_mediaState;
-    dvd::StreamAction m_nextStreamAction;
+    bool m_flush;
+    QSizeF m_resolution;
 };
 
 #endif // DVDCONTEXT_H

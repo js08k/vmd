@@ -30,6 +30,9 @@ private slots:
     void lineEditHostAddressFinished();
     void lineEditSimulatedDelayFinished();
     void lineEditPeerAddressFinished();
+    void dvdStartTitleChanged(int);
+    void dvdStartChapterChanged(int);
+
     void clickPushButtonConnect();
     void clickPushButtonAdd();
     void clickPushButtonRemove();

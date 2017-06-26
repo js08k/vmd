@@ -4,8 +4,11 @@
 #include <QMediaPlayer>
 #include "dvd/dvdcontext.h"
 #include <QTime>
+#include "MediaFrame.h"
 
 namespace dvd { class StreamPlayer; }
+namespace dvd { class MediaFrame; }
+
 //namespace dvd { class StreamBuffer; }
 class StreamBuffer;
 
@@ -21,7 +24,7 @@ signals:
     void resumeReadStream() const;
 
 public slots:
-    void stream(QByteArray const&, dvd::StreamAction);
+    void stream(dvd::MediaFrame frame);
 
 private slots:
     void ready();

@@ -3,4 +3,4 @@ TEMPLATE = subdirs
 SUBDIRS += \
     vmd \
     player \
-    DvDPlayer
+#    DvDPlayer

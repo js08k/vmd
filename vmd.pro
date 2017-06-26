@@ -22,3 +22,12 @@ apps.subdir = apps
 
 installer.depends = apps
 installer.subdir = installer
+
+OTHER_FILES += \
+    README.md
+
+HEADERS += \
+    include/dvd/mediaframe.h
+
+SOURCES += \
+    lib/dvd/mediaframe.cpp
