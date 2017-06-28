@@ -38,7 +38,8 @@ SOURCES += \
     VideoWidget.cpp \
     menubutton.cpp \
     streamplayer.cpp \
-    MediaFrame.cpp
+    MediaFrame.cpp \
+    mediainput.cpp
 
 HEADERS += \
     ../../include/dvd/dvd_global.h \
@@ -48,7 +49,8 @@ HEADERS += \
     ../../include/dvd/VideoWidget.h \
     ../../include/dvd/menubutton.h \
     ../../include/dvd/streamplayer.h \
-    ../../include/dvd/MediaFrame.h
+    ../../include/dvd/MediaFrame.h \
+    ../../include/dvd/mediainput.h
 
 unix {
     target.path = /usr/lib
@@ -59,3 +61,6 @@ LIBS += \
     -L/usr/local/libdvdcss/lib -ldvdcss \
     -L/usr/local/libdvdnav/lib -ldvdnav \
     -L/usr/local/libdvdread/lib -ldvdread
+
+DISTFILES += \
+    classes.uml

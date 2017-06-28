@@ -66,7 +66,6 @@ bool DvDContext::open( QString const& device )
         DVDClose(reader);
     }
 
-    std::cout << "Loading " << m_title.toStdString() << std::endl;
     emit title( m_title );
 
     if ( m_handle )
