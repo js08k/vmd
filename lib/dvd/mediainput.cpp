@@ -9,8 +9,8 @@
 #include <QFileInfo>
 
 dvd::MediaInput::MediaInput( QString const& name )
-    : m_name(name)
-    , m_type(TypeDVD)
+    : m_type(TypeDVD)
+    , m_name(name)
 {
     QRegExp exp( "^(dvd|file)://(\\S+)$" );
     exp.indexIn( name );
@@ -19,12 +19,8 @@ dvd::MediaInput::MediaInput( QString const& name )
     {
         if ( exp.cap(1) == "dvd" )
             m_type = TypeDVD;
-        else if ( exp.cap(1) == "iso" )
-            m_type = TypeISO;
         else
             m_type = TypeMPEG;
-
-        m_name = exp.cap(2);
     }
     else
     {

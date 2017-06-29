@@ -1,5 +1,4 @@
-#ifndef DVDCONTEXT_H
-#define DVDCONTEXT_H
+#pragma once
 
 #include "dvd/dvd_global.h"
 #include <QObject>
@@ -73,5 +72,3 @@ private:
     bool m_flush;
     QSizeF m_resolution;
 };
-
-#endif // DVDCONTEXT_H

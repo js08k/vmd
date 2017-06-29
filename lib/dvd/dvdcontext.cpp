@@ -1,3 +1,20 @@
+/* UML Class Diagram
+@startuml
+
+class DvDContext <<MediaSender>> {
++{abstract}open(string) : bool
+
+-- slot --
++highlight(MenuButton)
++activate(MenuButton)
++menu()
++pause()
++resume()
+}
+
+@enduml
+*/
+
 #include "dvd/dvdcontext.h"
 
 #include "dvd/MediaFrame.h"

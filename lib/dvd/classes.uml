@@ -14,91 +14,27 @@ enum MediaState {
     MediaReading
 }
 
-class MediaFrame {
-{static}frames(QByteArray, Action) : vector<MediaFrame>
-+MediaFrame()
-+MediaFrame(gtqt::MediaFrame)
-+encrypt(QString)
-+decrypt(QString)
-}
-
-QIODevice <|-- MediaContext
-class MediaContext {
-+{abstract}open(QString) : bool
-
-'Required for implementation of QIODevice'
-+{abstract}isSequential( ) const : bool
-+{abstract}bytesAvailable( ) const : qint64
--{abstract}readData(char*, qint64) : qint64
--{abstract}writeData(char const*, qint64)
-
-'Allow for pausing/resuming the reading stream'
-#{abstract}pauseStream()
-#{abstract}resumeStream()
-
--- private --
--int const m_minbuffered
--int const m_maxbuffered
--QByteArray m_data
+MediaContext <|-- MediaSender
+class MediaSender <<MediaContext>> {
 
 -- signals --
-+stream(MediaFrame)
-+title(QString)
-+resolution(QSizeF)
-+mediaStateChanged(MediaState)
+{field}connected to MediaReceiver
++send(MediaFrame)
 
 -- slots --
-+{abstract}highlight(MenuButton)
-+{abstract}activate(MenuButton)
-+{abstract}menu()
-+pause()
-+resume()
-}
-
-MediaContext <|-- MediaSender
-class MediaSender {
-
-}
-
-MediaSender <|-- DvDContext
-class DvDContext {
-+{abstract}open(QString) : bool
-
--- slots --
-+highlight(MenuButton)
-+activate(MenuButton)
-+menu()
-+pause()
-+resume()
-}
-
-MediaSender <|-- MPEGContext
-class MPEGContext {
-+{abstract}open(QString) : bool
-
--- slots --
-+pause()
-+resume()
--highlight(MenuButton)
--activate(MenuButton)
--menu()
+{field}connected to MediaReceiver
++receive(StreamControl)
 }
 
 MediaContext <|-- MediaReceiver
-class MediaReceiver {
-
-}
-
-MediaReceiver <|-- NetworkContext
-class NetworkContext {
-+{abstract}open(QString) : bool
+class MediaReceiver <<MediaContext>> {
+-- signals --
+{field}connected to MediaSender
++send(StreamControl)
 
 -- slots --
-+highlight(MenuButton)
-+activate(MenuButton)
-+menu()
-+pause()
-+resume()
+{field}connected to MediaSender
++receive(MediaFrame)
 }
 
 @enduml

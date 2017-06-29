@@ -1,4 +1,18 @@
+/* UML Class Diagram
+@startuml
+
+class MediaFrame <<gtqt.MediaFrame>> {
+{static}frames(QByteArray, Action) : vector<MediaFrame>
++MediaFrame()
++MediaFrame(gtqt::MediaFrame)
++encrypt(QString)
++decrypt(QString)
+}
+
+@enduml
+*/
 #include "dvd/MediaFrame.h"
+
 #include <QString>
 
 dvd::MediaFrame::MediaFrame()

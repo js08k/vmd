@@ -1,3 +1,19 @@
+/*
+@startuml
+
+class MPEGContext <<MediaSender>> {
++{abstract}open(QString) : bool
+
+-- slots --
++pause()
++resume()
+-highlight(MenuButton)
+-activate(MenuButton)
+-menu()
+}
+
+@enduml
+*/
 #include "dvd/mpegcontext.h"
 
 #include <QTimer>

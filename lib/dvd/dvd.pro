@@ -39,7 +39,10 @@ SOURCES += \
     menubutton.cpp \
     streamplayer.cpp \
     MediaFrame.cpp \
-    mediainput.cpp
+    mediainput.cpp \
+    mediacontext.cpp \
+    networkcontext.cpp \
+    streamdelay.cpp
 
 HEADERS += \
     ../../include/dvd/dvd_global.h \
@@ -50,7 +53,10 @@ HEADERS += \
     ../../include/dvd/menubutton.h \
     ../../include/dvd/streamplayer.h \
     ../../include/dvd/MediaFrame.h \
-    ../../include/dvd/mediainput.h
+    ../../include/dvd/mediainput.h \
+    ../../include/dvd/mediacontext.h \
+    ../../include/dvd/networkcontext.h \
+    ../../include/dvd/streamdelay.h
 
 unix {
     target.path = /usr/lib
@@ -62,5 +68,7 @@ LIBS += \
     -L/usr/local/libdvdnav/lib -ldvdnav \
     -L/usr/local/libdvdread/lib -ldvdread
 
-DISTFILES += \
+OTHER_FILES += \
     classes.uml
+
+

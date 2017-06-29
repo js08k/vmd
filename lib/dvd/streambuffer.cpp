@@ -1,3 +1,23 @@
+/*
+@startuml
+
+class StreamBuffer <<QIODevice>>{
+'Required for implementation of QIODevice'
++{abstract}isSequential( ) const final : bool
++{abstract}bytesAvailable( ) const final : qint64
++{abstract}size() const final : qint64
+-{abstract}readData(char*, qint64) final : qint64
+-{abstract}writeData(char const*, qint64) final
+
+-- private --
+-int const m_minbuffered
+-int const m_maxbuffered
+-QByteArray m_data
+}
+
+@enduml
+*/
+
 #include "dvd/streambuffer.h"
 #include <QtGlobal>
 #include <QTimer>
