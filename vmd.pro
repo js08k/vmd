@@ -9,12 +9,12 @@
 TEMPLATE = subdirs
 
 SUBDIRS += \
-    gtqt \
-    apps \
+#    gtqt \
+#    apps \
     lib \
     #installer
 
-lib.depends = gtqt
+#lib.depends = gtqt
 lib.subdir = lib
 
 apps.depends = gtqt lib
@@ -25,9 +25,3 @@ installer.subdir = installer
 
 OTHER_FILES += \
     README.md
-
-HEADERS += \
-    include/dvd/mediaframe.h
-
-SOURCES += \
-    lib/dvd/mediaframe.cpp

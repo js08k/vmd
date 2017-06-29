@@ -1,15 +1,16 @@
 TEMPLATE = subdirs
 
 SUBDIRS += \
-#    gtqtbuild \
-#    util \
-#    dvd \
+    #gtqtbuild \
+    #util \
+    #dvd \
     dvdread \
     dvdnav \
-    dvdcss
+    dvdcss \
+    protobuf
 
-#dvd.depends += gtqtbuild
-#dvd.subdir = dvd
+dvd.depends += gtqtbuild
+dvd.subdir = dvd
 
 OTHER_FILES += \
     uml.pri
