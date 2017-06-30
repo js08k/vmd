@@ -1,3 +1,23 @@
+/*
+@startuml
+
+class MenuButton {
++MenuButton(int)
++operator==(MenuButton) : bool
++isNull() : bool
++mapToScreen(QSizeF) const : QRectF
++setResolution(QSizeF)
++resolution() const : QRectF
++setButtonRect(QRectF)
++buttonRect() const : QRectF
+-QUuid m_id
+-int m_index
+-QSizeF m_resolution
+-QRectF m_button
+}
+
+@enduml
+*/
 #include "dvd/menubutton.h"
 
 MenuButton::MenuButton( int index )

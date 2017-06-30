@@ -6,30 +6,37 @@
 !include dvdcontext.cpp
 !include mpegcontext.cpp
 !include networkcontext.cpp
+!include menubutton.cpp
 
 note right of MediaContext : \
-There may be a conflict with\n \
-pauseStream/playStream when\n \
-a NetworkContext plays and a \n \
-DvDContext calls pause on the\n \
-same source stream.
+There may be a conflict\n\
+with pauseStream/playStream\n\
+when a NetworkContext plays\n\
+and a DvDContext calls pause\n\
+on the same source stream.
 
 interface StreamInterface {
-+{abstract}pause()
-+{abstract}resume()
-+{abstract}title() : string
++{abstract}title() : string = 0
+
+-- Signals --
++{abstract}mediaStateChanged(MediaState) = 0
+
+-- Slots --
++{abstract}pause() = 0
++{abstract}resume() = 0
 }
 
 StreamInterface <|-- DvDInterface
 interface DvDInterface {
-+{abstract}menu()
-+{abstract}highlight(MenuButton)
-+{abstract}activate(MenuButton)
+-- Slots --
++{abstract}menu() = 0
++{abstract}highlight(MenuButton) = 0
++{abstract}activate(MenuButton) = 0
 }
 
 StreamInterface <|-- MPEGContext
 DvDInterface <|-- NetworkContext
-DvDInterface <|-- DvDContext
+
 
 enum Action {
     ActionAppend

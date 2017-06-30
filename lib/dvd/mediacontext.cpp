@@ -1,25 +1,13 @@
 /*
 @startuml
 
-class MediaContext <<QObject>>{
-+{abstract}open(QString) : bool
-
-'Allow for pausing/resuming the reading stream'
-#{abstract}pauseStream()
-#{abstract}resumeStream()
+interface MediaContext {
++{abstract}open(QString) : bool = 0
 
 -- signals --
-+stream(MediaFrame)
-+title(QString)
-+resolution(QSizeF)
-+mediaStateChanged(MediaState)
-
-'-- slots --'
-'+{abstract}highlight(MenuButton)'
-'+{abstract}activate(MenuButton)'
-'+{abstract}menu()'
-'+pause()'
-'+resume()'
++stream(MediaFrame) = 0
++{abstract}pauseStream() = 0
++{abstract}resumeStream() = 0
 }
 
 @enduml

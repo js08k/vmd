@@ -1,8 +1,12 @@
 /*
 @startuml
 
+QObject <|-- MediaSender
 MediaContext <|-- MediaSender
-class MediaSender <<MediaContext>> {
+class MediaSender  {
+-tryPauseStream()
+-tryResumeStream()
+-bool m_streamPaused
 
 -- signals --
 {field}connected to MediaReceiver
