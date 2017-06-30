@@ -1,10 +1,49 @@
 @startuml
 
+!include mediacontext.cpp
+!include mediasender.cpp
+!include mediareceiver.cpp
+!include dvdcontext.cpp
+!include mpegcontext.cpp
+!include networkcontext.cpp
+
+note right of MediaContext : \
+There may be a conflict with\n \
+pauseStream/playStream when\n \
+a NetworkContext plays and a \n \
+DvDContext calls pause on the\n \
+same source stream.
+
+interface StreamInterface {
++{abstract}pause()
++{abstract}resume()
++{abstract}title() : string
+}
+
+StreamInterface <|-- DvDInterface
+interface DvDInterface {
++{abstract}menu()
++{abstract}highlight(MenuButton)
++{abstract}activate(MenuButton)
+}
+
+StreamInterface <|-- MPEGContext
+DvDInterface <|-- NetworkContext
+DvDInterface <|-- DvDContext
+
 enum Action {
     ActionAppend
     ActionFlush
     ActionDecryptAppend
     ActionDecryptFlush
+}
+
+enum StreamControl {
+    SendInfo
+    PauseStream
+    ResumeStream
+    PausePlayback
+    ResumePlayback
 }
 
 enum MediaState {
@@ -14,27 +53,6 @@ enum MediaState {
     MediaReading
 }
 
-MediaContext <|-- MediaSender
-class MediaSender <<MediaContext>> {
 
--- signals --
-{field}connected to MediaReceiver
-+send(MediaFrame)
-
--- slots --
-{field}connected to MediaReceiver
-+receive(StreamControl)
-}
-
-MediaContext <|-- MediaReceiver
-class MediaReceiver <<MediaContext>> {
--- signals --
-{field}connected to MediaSender
-+send(StreamControl)
-
--- slots --
-{field}connected to MediaSender
-+receive(MediaFrame)
-}
 
 @enduml

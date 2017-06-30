@@ -1,15 +1,16 @@
 /*
 @startuml
 
+MediaSender <|-- MPEGContext
 class MPEGContext <<MediaSender>> {
 +{abstract}open(QString) : bool
 
 -- slots --
 +pause()
 +resume()
--highlight(MenuButton)
--activate(MenuButton)
--menu()
+'-highlight(MenuButton)'
+'-activate(MenuButton)'
+'-menu()'
 }
 
 @enduml

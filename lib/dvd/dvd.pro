@@ -42,7 +42,9 @@ SOURCES += \
     mediainput.cpp \
     mediacontext.cpp \
     networkcontext.cpp \
-    streamdelay.cpp
+    streamdelay.cpp \
+    mediasender.cpp \
+    mediareceiver.cpp
 
 HEADERS += \
     ../../include/dvd/dvd_global.h \
@@ -56,7 +58,9 @@ HEADERS += \
     ../../include/dvd/mediainput.h \
     ../../include/dvd/mediacontext.h \
     ../../include/dvd/networkcontext.h \
-    ../../include/dvd/streamdelay.h
+    ../../include/dvd/streamdelay.h \
+    ../../include/dvd/mediasender.h \
+    ../../include/dvd/mediareceiver.h
 
 unix {
     target.path = /usr/lib
@@ -68,7 +72,10 @@ LIBS += \
     -L/usr/local/libdvdnav/lib -ldvdnav \
     -L/usr/local/libdvdread/lib -ldvdread
 
-OTHER_FILES += \
-    classes.uml
+UML_SOURCE += \
+    classes.uml \
+    $$SOURCES
+
+include(../uml.pri)
 
 

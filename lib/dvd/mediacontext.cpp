@@ -14,12 +14,12 @@ class MediaContext <<QObject>>{
 +resolution(QSizeF)
 +mediaStateChanged(MediaState)
 
--- slots --
-+{abstract}highlight(MenuButton)
-+{abstract}activate(MenuButton)
-+{abstract}menu()
-+pause()
-+resume()
+'-- slots --'
+'+{abstract}highlight(MenuButton)'
+'+{abstract}activate(MenuButton)'
+'+{abstract}menu()'
+'+pause()'
+'+resume()'
 }
 
 @enduml

@@ -1,6 +1,7 @@
 /* UML Class Diagram
 @startuml
 
+MediaSender <|-- DvDContext
 class DvDContext <<MediaSender>> {
 +{abstract}open(string) : bool
 

@@ -34,6 +34,7 @@ message NetPing
 // Message used to control the stream and the stream playback
 message StreamRequest
 {
+    // StreamControl
     enum Action
     {
         // Request the MediaInfo from the host

@@ -1,6 +1,7 @@
 /*
 @startuml
 
+MediaReceiver <|-- NetworkContext
 class NetworkContext <<MediaReceiver>>{
 +{abstract}open(QString) : bool
 

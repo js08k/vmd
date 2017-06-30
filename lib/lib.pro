@@ -1,13 +1,13 @@
 TEMPLATE = subdirs
 
 SUBDIRS += \
-    #gtqtbuild \
-    #util \
-    #dvd \
+    gtqtbuild \
+    util \
+    dvd \
     dvdread \
     dvdnav \
     dvdcss \
-    protobuf
+#    protobuf
 
 dvd.depends += gtqtbuild
 dvd.subdir = dvd

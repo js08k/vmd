@@ -1,6 +1,9 @@
 isEmpty(UML_SOURCE) {
     error( UML_SOURCE variable must be defined before including uml.pri )
 }
+isEmpty(PLANTUML) {
+    error( PLANTUML variable must be defined before including uml.pri )
+}
 isEmpty(UML_FORMAT) {
     UML_FORMAT = PNG
 }
