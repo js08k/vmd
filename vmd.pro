@@ -24,4 +24,5 @@ installer.depends = apps
 installer.subdir = installer
 
 OTHER_FILES += \
-    README.md
+    README.md \
+    Makefile

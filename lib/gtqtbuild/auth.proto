@@ -49,7 +49,7 @@ message StreamRequest
         // Request the host/peer pause the playback of the stream
         PausePlayback = 4;
 
-        // Request teh host/peer resume the playback of the stream
+        // Request the host/peer resume the playback of the stream
         ResumePlayback = 5;
     }
 

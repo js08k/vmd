@@ -1,10 +1,11 @@
 #ifndef MENUBUTTON_H
 #define MENUBUTTON_H
 
+#include "dvd/dvd.h"
 #include <QRectF>
 #include <QUuid>
 
-class MenuButton
+class dvd::MenuButton
 {
 public:
     MenuButton( int index = -1 );

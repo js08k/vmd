@@ -2,15 +2,8 @@
 @startuml
 
 MediaReceiver <|-- NetworkContext
-class NetworkContext <<MediaReceiver>>{
+class NetworkContext {
 +{abstract}open(QString) : bool
-
--- slots --
-+highlight(MenuButton)
-+activate(MenuButton)
-+menu()
-+pause()
-+resume()
 }
 
 @enduml

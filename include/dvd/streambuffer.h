@@ -1,12 +1,15 @@
 #ifndef STREAMBUFFER_H
 #define STREAMBUFFER_H
 
+#include "dvd/dvd.h"
+
 #include <QBuffer>
 #include "dvd/dvdcontext.h"
+#include "dvd/MediaFrame.h"
 
 class QTimer;
 
-class StreamBuffer
+class DVDSHARED_EXPORT dvd::StreamBuffer
         : public QIODevice
 {
     Q_OBJECT
@@ -28,7 +31,7 @@ public:
     virtual qint64 size() const;
 
 public slots:
-    void stream(QByteArray const&,dvd::StreamAction);
+    void stream(dvd::MediaFrame frame);
 
 signals:
     void ready() const;

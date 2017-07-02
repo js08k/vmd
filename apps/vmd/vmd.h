@@ -42,6 +42,7 @@ private slots:
     void setTitle( QString const& title );
 
     void receive( gtqt::DataPackage<gtqt::ClientType1> const& );
+    void receive( gtqt::DataPackage<gtqt::MediaInfo> const& );
 
     void timeout();
 
@@ -56,7 +57,7 @@ private:
     gtqt::PeerLink* m_link;
 
     QThread* m_mediaThread;
-    DvDContext* m_mediaContext;
+    dvd::MediaContext* m_context;
 //    QMediaPlayer* m_player;
 //    StreamBuffer m_buffer;
     dvd::StreamPlayer* m_player;

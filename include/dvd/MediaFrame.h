@@ -1,27 +1,31 @@
-#ifndef MEDIAFRAME_H
-#define MEDIAFRAME_H
+#pragma once
 
+#include "dvd/dvd.h"
 #include "message.h"
 #include <QList>
 
-namespace dvd { class MediaFrame; }
 class QString;
+
+namespace dvd { class MediaFrame; }
+namespace dvd
+{
+    // Factory function
+    QVector<MediaFrame> frames(QByteArray, Action actn = Append );
+}
 
 class dvd::MediaFrame
         : public gtqt::MediaFrame
 {
 public:
-    enum Action
-    {
-        Append = gtqt::MediaFrame::Append,
-        Flush = gtqt::MediaFrame::Flush
-    };
-
     MediaFrame();
     MediaFrame( gtqt::MediaFrame const& other );
-    static QList<dvd::MediaFrame> frames( QByteArray, Action actn = Append );
     void encrypt( QString const& key );
     void decrypt( QString const& key );
+    explicit operator dvd::Action() const;
+    inline explicit operator QByteArray() const;
 };
 
-#endif // MEDIAFRAME_H
+dvd::MediaFrame::operator QByteArray() const
+{
+    return QByteArray( data().c_str(), data().length() );
+}

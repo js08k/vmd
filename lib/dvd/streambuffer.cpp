@@ -19,10 +19,11 @@ class StreamBuffer <<QIODevice>>{
 */
 
 #include "dvd/streambuffer.h"
+#include "dvd/MediaFrame.h"
 #include <QtGlobal>
 #include <QTimer>
 
-StreamBuffer::StreamBuffer(QObject* parent)
+dvd::StreamBuffer::StreamBuffer(QObject* parent)
     : QIODevice(parent)
     , m_minbuffered(1024*1024*4)
     , m_maxbuffered(m_minbuffered*2)
@@ -31,7 +32,7 @@ StreamBuffer::StreamBuffer(QObject* parent)
     open( QIODevice::ReadWrite );
 }
 
-StreamBuffer::StreamBuffer(QByteArray const& other, QObject* parent)
+dvd::StreamBuffer::StreamBuffer(QByteArray const& other, QObject* parent)
     : QIODevice(parent)
     , m_minbuffered(1024*1024)
     , m_maxbuffered(m_minbuffered*2)
@@ -41,44 +42,44 @@ StreamBuffer::StreamBuffer(QByteArray const& other, QObject* parent)
     open( QIODevice::ReadWrite );
 }
 
-StreamBuffer::~StreamBuffer()
+dvd::StreamBuffer::~StreamBuffer()
 {
 
 }
 
-void StreamBuffer::close()
+void dvd::StreamBuffer::close()
 {
     setOpenMode( QIODevice::NotOpen );
 }
 
-bool StreamBuffer::open(OpenMode flags)
+bool dvd::StreamBuffer::open(OpenMode flags)
 {
     setOpenMode(flags);
     return true;
 }
 
-qint64 StreamBuffer::pos() const
+qint64 dvd::StreamBuffer::pos() const
 {
     return 0;
 }
 
-qint64 StreamBuffer::bytesAvailable() const
+qint64 dvd::StreamBuffer::bytesAvailable() const
 {
     return m_data.size();
 }
 
-bool StreamBuffer::seek(qint64 pos)
+bool dvd::StreamBuffer::seek(qint64 pos)
 {
     QIODevice::seek(pos);
     return false;
 }
 
-qint64 StreamBuffer::size() const
+qint64 dvd::StreamBuffer::size() const
 {
     return m_data.size();
 }
 
-qint64 StreamBuffer::readData(char *data, qint64 maxSize)
+qint64 dvd::StreamBuffer::readData(char *data, qint64 maxSize)
 {
     maxSize = qMin( maxSize, qint64(m_data.length()) );
     memcpy(data, m_data.data(), maxSize );
@@ -96,25 +97,29 @@ qint64 StreamBuffer::readData(char *data, qint64 maxSize)
     return maxSize;
 }
 
-qint64 StreamBuffer::writeData(char const* data, qint64 size)
+qint64 dvd::StreamBuffer::writeData(char const* data, qint64 size)
 {
     m_data += QByteArray(data,size);
     return 0;
 }
 
-void StreamBuffer::stream(QByteArray const& data, dvd::StreamAction action)
+void dvd::StreamBuffer::stream(dvd::MediaFrame frame)
 {
-    if ( !data.isEmpty() )
+    if ( frame.data().length() > 0 )
     {
-        switch ( action )
+        switch ( dvd::Action(frame) )
         {
-        case dvd::AppendStream:
-            write(data);
+        case dvd::DecryptAppend:
+            frame.decrypt("todo");
+        case dvd::Append:
+            write(frame.data().c_str(), frame.data().length());
             break;
-        case dvd::FlushStream:
+        case dvd::DecryptTruncate:
+            frame.decrypt("todo");
+        case dvd::Truncate:
             m_ready = false;
             m_data.clear();
-            write(data);
+            write(frame.data().c_str(), frame.data().length());
             break;
         }
 

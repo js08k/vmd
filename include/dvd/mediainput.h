@@ -1,26 +1,34 @@
 #ifndef MEDIAINPUT_H
 #define MEDIAINPUT_H
 
+#include "dvd/dvd.h"
+
 #include <QString>
+#include <QObject>
+#include <QSharedPointer>
+
+#include <functional>
 
 namespace dvd { class MediaInput; }
 
 class dvd::MediaInput
 {
 public:
-    enum Type
-    {
-        TypeDVD,
-        TypeMPEG
-    };
-
-    MediaInput( QString const& name );
+    MediaInput();
+    bool initialize( QString const& );
+    dvd::MediaContext* create( QObject* parent = 0 ) const;
     QString name() const;
-    QString filename() const;
+    QString path() const;
 
 private:
-    Type m_type;
-    QString const m_name;
+    bool tryDVD(QString const&);
+    bool tryFile(QString const&);
+    bool tryPeer(QString const&);
+
+private:
+    dvd::MediaType m_type;
+    QString m_path;
+    QString m_name;
 };
 
 #endif // MEDIAINPUT_H

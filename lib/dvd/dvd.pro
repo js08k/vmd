@@ -32,6 +32,7 @@ INCLUDEPATH += \
     /usr/local/libdvdread/include
 
 SOURCES += \
+    dvd.cpp \
     dvdcontext.cpp \
     mpegcontext.cpp \
     streambuffer.cpp \
@@ -42,12 +43,11 @@ SOURCES += \
     mediainput.cpp \
     mediacontext.cpp \
     networkcontext.cpp \
-    streamdelay.cpp \
     mediasender.cpp \
     mediareceiver.cpp
 
 HEADERS += \
-    ../../include/dvd/dvd_global.h \
+    ../../include/dvd/dvd.h \
     ../../include/dvd/dvdcontext.h \
     ../../include/dvd/mpegcontext.h \
     ../../include/dvd/streambuffer.h \
@@ -58,7 +58,6 @@ HEADERS += \
     ../../include/dvd/mediainput.h \
     ../../include/dvd/mediacontext.h \
     ../../include/dvd/networkcontext.h \
-    ../../include/dvd/streamdelay.h \
     ../../include/dvd/mediasender.h \
     ../../include/dvd/mediareceiver.h
 

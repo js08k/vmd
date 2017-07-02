@@ -20,14 +20,15 @@ class MenuButton {
 */
 #include "dvd/menubutton.h"
 
-MenuButton::MenuButton( int index )
+// Qt Includes
+
+dvd::MenuButton::MenuButton( int index )
     : m_id(QUuid::createUuid())
     , m_index(index)
 {
-
 }
 
-MenuButton::MenuButton( MenuButton const& other )
+dvd::MenuButton::MenuButton( MenuButton const& other )
     : m_id( other.m_id )
     , m_index( other.m_index )
     , m_resolution( other.m_resolution )
@@ -36,27 +37,27 @@ MenuButton::MenuButton( MenuButton const& other )
 
 }
 
-MenuButton::~MenuButton()
+dvd::MenuButton::~MenuButton()
 {
 
 }
 
-bool MenuButton::operator==( MenuButton const& other) const
+bool dvd::MenuButton::operator==( MenuButton const& other) const
 {
     return m_id == other.m_id;
 }
 
-bool MenuButton::isNull() const
+bool dvd::MenuButton::isNull() const
 {
     return bool(m_index == -1);
 }
 
-int MenuButton::index() const
+int dvd::MenuButton::index() const
 {
     return m_index;
 }
 
-QRectF MenuButton::mapToScreen(QSizeF const& screen) const
+QRectF dvd::MenuButton::mapToScreen(QSizeF const& screen) const
 {
     qreal const xscale( screen.width() / m_resolution.width() );
     qreal const yscale( screen.height() / m_resolution.height() );
@@ -65,27 +66,27 @@ QRectF MenuButton::mapToScreen(QSizeF const& screen) const
                    m_button.width()*xscale, m_button.height()*yscale );
 }
 
-void MenuButton::setResolution(const QSizeF &resolution)
+void dvd::MenuButton::setResolution(const QSizeF &resolution)
 {
     m_resolution = resolution;
 }
 
-QSizeF MenuButton::resolution() const
+QSizeF dvd::MenuButton::resolution() const
 {
     return m_resolution;
 }
 
-void MenuButton::setButtonRect(QRectF const& button)
+void dvd::MenuButton::setButtonRect(QRectF const& button)
 {
     m_button = button;
 }
 
-QRectF MenuButton::buttonRect() const
+QRectF dvd::MenuButton::buttonRect() const
 {
     return m_button;
 }
 
-bool MenuButton::update( MenuButton const& other )
+bool dvd::MenuButton::update( MenuButton const& other )
 {
     bool updated(false);
 

@@ -1,7 +1,6 @@
 /*
 @startuml
 
-QObject <|-- MediaReceiver
 MediaContext <|-- MediaReceiver
 class MediaReceiver {
 -tryPauseStream()
@@ -9,12 +8,15 @@ class MediaReceiver {
 -bool m_streamPaused
 
 -- signals --
-{field}connected to MediaSender
 +send(StreamControl)
 
 -- slots --
-{field}connected to MediaSender
 +receive(MediaFrame)
++highlight(MenuButton)
++activate(MenuButton)
++menu()
++pause()
++resume()
 }
 
 @enduml

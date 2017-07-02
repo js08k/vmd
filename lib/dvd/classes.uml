@@ -1,5 +1,6 @@
 @startuml
 
+!include dvd.cpp
 !include mediacontext.cpp
 !include mediasender.cpp
 !include mediareceiver.cpp
@@ -15,51 +16,6 @@ when a NetworkContext plays\n\
 and a DvDContext calls pause\n\
 on the same source stream.
 
-interface StreamInterface {
-+{abstract}title() : string = 0
-
--- Signals --
-+{abstract}mediaStateChanged(MediaState) = 0
-
--- Slots --
-+{abstract}pause() = 0
-+{abstract}resume() = 0
-}
-
-StreamInterface <|-- DvDInterface
-interface DvDInterface {
--- Slots --
-+{abstract}menu() = 0
-+{abstract}highlight(MenuButton) = 0
-+{abstract}activate(MenuButton) = 0
-}
-
-StreamInterface <|-- MPEGContext
-DvDInterface <|-- NetworkContext
-
-
-enum Action {
-    ActionAppend
-    ActionFlush
-    ActionDecryptAppend
-    ActionDecryptFlush
-}
-
-enum StreamControl {
-    SendInfo
-    PauseStream
-    ResumeStream
-    PausePlayback
-    ResumePlayback
-}
-
-enum MediaState {
-    MediaNotAvailable
-    MediaLoading
-    MediaIdle
-    MediaReading
-}
-
-
+MediaSender <--> MediaReceiver : Comms Via Network
 
 @enduml

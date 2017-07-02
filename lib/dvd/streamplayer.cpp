@@ -15,20 +15,7 @@ dvd::StreamPlayer::StreamPlayer(QObject *parent)
 
 void dvd::StreamPlayer::stream(dvd::MediaFrame frame)
 {
-    switch ( frame.action() )
-    {
-    case gtqt::MediaFrame::DecryptFlush:
-        frame.decrypt( QString() );
-    case gtqt::MediaFrame::Flush:
-        stop();
-        m_buffer->stream(QByteArray(frame.data().c_str(),frame.data().length()), dvd::FlushStream );
-        break;
-    case gtqt::MediaFrame::DecryptAppend:
-        frame.decrypt( QString() );
-    case gtqt::MediaFrame::Append:
-        m_buffer->stream(QByteArray(frame.data().c_str(),frame.data().length()), dvd::AppendStream );
-        break;
-    }
+    m_buffer->stream(frame);
 }
 
 void dvd::StreamPlayer::ready()

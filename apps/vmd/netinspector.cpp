@@ -92,7 +92,7 @@ void NetInspector::average()
 
     // Calculate the average delay over the last up to 30 measurments
     int average(0);
-    foreach ( int value, m_average )
+    for ( int value : m_average )
     { average += value; }
 
     // Save the calculated value

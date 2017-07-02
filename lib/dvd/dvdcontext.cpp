@@ -1,9 +1,8 @@
 /* UML Class Diagram
 @startuml
 
-DvDInterface <|-- DvDContext
 MediaSender <|-- DvDContext
-class DvDContext <<MediaSender>> {
+class DvDContext {
 +{abstract}open(string) : bool
 
 -- slot --
@@ -35,54 +34,49 @@ class DvDContext <<MediaSender>> {
 #include <QRect>
 #include <QList>
 
-DvDContext::DvDContext(QObject* parent)
-    : QObject(parent)
+dvd::DvDContext::DvDContext(QObject* parent)
+    : MediaSender(parent)
+    , m_state(dvd::NotAvailable)
     , m_handle(0)
     , m_title("UNKNOWN")
     , m_loop(new QTimer)
-    , m_mediaState(dvd::MediaNotAvailable)
     , m_flush(false)
 {
     qRegisterMetaType<dvd::MediaFrame>("dvd::MediaFrame");
-    qRegisterMetaType<dvd::StreamAction>("dvd::StreamAction");
-    qRegisterMetaType<MenuButton>("MenuButton");
-    qRegisterMetaType<QList<MenuButton> >("QList<MenuButton>");
+    qRegisterMetaType<dvd::Action>("dvd::Action");
+    qRegisterMetaType<dvd::MenuButton>("dvd::MenuButton");
+    qRegisterMetaType<QList<dvd::MenuButton> >("QList<dvd::MenuButton>");
 
     connect( m_loop, SIGNAL(timeout()), this, SLOT(loop()) );
     m_loop->setInterval(1);
 }
 
-DvDContext::~DvDContext()
+dvd::DvDContext::~DvDContext()
 {
     delete m_loop;
 }
 
-void DvDContext::setMediaState( dvd::MediaState state )
+void dvd::DvDContext::open( QString const& device )
 {
-    if ( state != m_mediaState )
+    // Set the state of the DvDContext, loading new media
+    setMediaState(dvd::Loading);
+
+    // Query the DvD title info (using libdvdread since libdvdnav always
+    // returns null results)
+    if ( dvd_reader_t* handle = DVDOpen(qPrintable(device)) )
     {
-        m_mediaState = state;
-        emit mediaStateChanged(m_mediaState);
-    }
-}
+        // Default dvd title to "UNKNOWN"
+        char vol_id[32] = "UNKNOWN";
 
-bool DvDContext::open( QString const& device )
-{
-    // Emit the signal indicating the disk is loading
-    setMediaState(dvd::MediaLoading);
-    bool opresult(false);
+        // First try UDF, then try ISO to get title
+        if ( DVDUDFVolumeInfo(handle,vol_id,32,0,0) == 0 ) { }
+        else if ( DVDISOVolumeInfo(handle,vol_id,32,0,0) == 0 ) { }
 
-    dvd_reader_t* reader( DVDOpen(qPrintable(device)) );
-    if ( reader )
-    {
-        char volid[32];
+        // Set the dvd title
+        m_title = QString(vol_id);
 
-        if ( DVDUDFVolumeInfo(reader,volid,32,0,0) == 0 )
-            m_title = QString(volid);
-        else if ( DVDISOVolumeInfo(reader,volid,32,0,0) == 0 )
-            m_title = QString(volid);
-
-        DVDClose(reader);
+        // Close the reader
+        DVDClose(handle);
     }
 
     emit title( m_title );
@@ -95,56 +89,57 @@ bool DvDContext::open( QString const& device )
 
     if ( dvdnav_open(&m_handle, qPrintable(device)) == DVDNAV_STATUS_OK )
     {
+        setReadStart();
         m_loop->start();
-        opresult = true;
-    }
-
-    if ( opresult )
-    {
-        m_flush = true;
-        resume();
     }
     else
-        setMediaState(dvd::MediaNotAvailable);
-
-    return opresult;
+    {
+        setMediaState(dvd::NotAvailable);
+    }
 }
 
-void DvDContext::pause()
+void dvd::DvDContext::pauseStream()
 {
-    switch ( m_mediaState )
+    switch ( m_state )
     {
-    case dvd::MediaNotAvailable:
+    case dvd::NotAvailable:
         break;
-    case dvd::MediaLoading:
+    case dvd::Loading:
         break;
-    case dvd::MediaIdle:
+    case dvd::Idle:
         break;
-    case dvd::MediaReading:
-        setMediaState(dvd::MediaIdle);
+    case dvd::Reading:
+        setMediaState(dvd::Idle);
         QTimer::singleShot(0,m_loop,SLOT(stop()));
         break;
     }
 }
 
-void DvDContext::resume()
+void dvd::DvDContext::resumeStream()
 {
-    switch ( m_mediaState )
+    switch ( m_state )
     {
-    case dvd::MediaNotAvailable:
+    case dvd::NotAvailable:
         break;
-    case dvd::MediaReading:
+    case dvd::Reading:
         break;
-    case dvd::MediaLoading:
+    case dvd::Loading:
         // Intentional fallthrough
-    case dvd::MediaIdle:
-        setMediaState(dvd::MediaReading);
+    case dvd::Idle:
+        setMediaState(dvd::Reading);
         QTimer::singleShot(0,m_loop,SLOT(start()));
         break;
     }
 }
 
-void DvDContext::loop()
+void dvd::DvDContext::setReadStart()
+{
+    // Navigate the DvD to the Menu
+    if ( DVDNAV_STATUS_ERR == dvdnav_menu_call(m_handle, DVD_MENU_Root) )
+        QTimer::singleShot( 0, this, SLOT(setReadStart()) );
+}
+
+void dvd::DvDContext::loop()
 {
     if ( !m_handle ) { return; }
 
@@ -163,24 +158,27 @@ void DvDContext::loop()
         switch(event)
         {
         case DVDNAV_BLOCK_OK:
-        {
-            // Convert the boolean to flush to the proper enumeration
-            dvd::MediaFrame::Action action(dvd::MediaFrame::Append);
-            if ( m_flush ){ action = dvd::MediaFrame::Flush; }
+            if ( m_state != dvd::Loading )
+            {
+                // Block streaming during the loading state
 
-            // Reset stream action to default action
-            m_flush = false;
+                // Convert the boolean to flush to the proper enumeration
+                dvd::Action action(dvd::Append);
+                if ( m_flush ){ action = dvd::Truncate; }
 
-            // Put the data into a QByteArray format
-            QByteArray const data(buffer,len);
+                // Reset stream action to default action
+                m_flush = false;
 
-            // Convert the data into MediaFrames
-            QList<dvd::MediaFrame> frms(dvd::MediaFrame::frames(data, action));
+                // Put the data into a QByteArray format
+                QByteArray const data(buffer,len);
 
-            // Transmit the frames
-            foreach ( dvd::MediaFrame frm, frms )
-                emit stream(frm);
-        }
+                // Convert the data into MediaFrames
+                QVector<dvd::MediaFrame> frms(dvd::frames(data, action));
+
+                // Transmit the frames
+                for ( dvd::MediaFrame frm : frms )
+                    emit stream(frm);
+            }
             break;
         case DVDNAV_NOP:
             break;
@@ -270,6 +268,11 @@ void DvDContext::loop()
         }
             break;
         case DVDNAV_HOP_CHANNEL:
+            if ( m_state == MediaState::Loading )
+            {
+                // End of the open function, menu has been loaded
+                setMediaState( MediaState::Reading );
+            }
             // Set the next stream emit to trigger a buffer flush
             m_flush = true;
             break;
@@ -279,7 +282,12 @@ void DvDContext::loop()
     }
 }
 
-void DvDContext::highlight( MenuButton const& btn )
+void dvd::DvDContext::menu()
+{
+    std::cout << "todo: Implement dvd::DVDContext::menu()" << std::endl;
+}
+
+void dvd::DvDContext::highlight(MenuButton const& btn )
 {
     int const index( btn.index() );
     if ( !btn.isNull() &&
@@ -294,7 +302,7 @@ void DvDContext::highlight( MenuButton const& btn )
     }
 }
 
-void DvDContext::activate( MenuButton const& btn )
+void dvd::DvDContext::activate(MenuButton const& btn )
 {
     std::cout << "Activate signal" << std::endl;
     if ( btn.isNull() ) return;

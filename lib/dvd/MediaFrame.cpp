@@ -13,22 +13,10 @@ class MediaFrame <<gtqt.MediaFrame>> {
 */
 #include "dvd/MediaFrame.h"
 
-#include <QString>
-
-dvd::MediaFrame::MediaFrame()
-{
-}
-
-dvd::MediaFrame::MediaFrame( gtqt::MediaFrame const& other )
-    : gtqt::MediaFrame(other)
-{
-}
-
-QList<dvd::MediaFrame> dvd::MediaFrame::frames(
-        QByteArray data, Action action )
+QVector<dvd::MediaFrame> dvd::frames( QByteArray data, dvd::Action action )
 {
     int const maxsize(gtqt::MediaFrame::MaxFrameSize);
-    QList<dvd::MediaFrame> frms;
+    QVector<dvd::MediaFrame> frms( data.length()/maxsize );
     int index(0);
 
     do
@@ -45,6 +33,15 @@ QList<dvd::MediaFrame> dvd::MediaFrame::frames(
     } while ( index < data.size() );
 
     return frms;
+}
+
+dvd::MediaFrame::MediaFrame()
+{
+}
+
+dvd::MediaFrame::MediaFrame( gtqt::MediaFrame const& other )
+    : gtqt::MediaFrame(other)
+{
 }
 
 void dvd::MediaFrame::encrypt( QString const& key )
@@ -86,4 +83,27 @@ void dvd::MediaFrame::decrypt( QString const& key )
     case gtqt::MediaFrame::DecryptFlush:
         break;
     }
+}
+
+dvd::MediaFrame::operator dvd::Action () const
+{
+    dvd::Action result( dvd::Append );
+
+    switch ( action() )
+    {
+    case gtqt::MediaFrame::Append:
+        result = dvd::Append;
+        break;
+    case gtqt::MediaFrame::Flush:
+        result = dvd::Truncate;
+        break;
+    case gtqt::MediaFrame::DecryptAppend:
+        result = dvd::DecryptAppend;
+        break;
+    case gtqt::MediaFrame::DecryptFlush:
+        result = dvd::DecryptTruncate;
+        break;
+    }
+
+    return result;
 }

@@ -19,11 +19,11 @@ public:
     virtual ~VideoWidget();
 
 signals:
-    void highlight( MenuButton const& ) const;
-    void activate( MenuButton const& ) const;
+    void highlight( dvd::MenuButton const& ) const;
+    void activate( dvd::MenuButton const& ) const;
 
 public slots:
-    void buttons( QList<MenuButton> const& );
+    void buttons( QList<dvd::MenuButton> const& );
 
 protected:
     virtual void mouseMoveEvent( QMouseEvent* event );
@@ -35,7 +35,7 @@ private slots:
 private:
     QPoint m_lastCursorPosition;
     QTime m_lastCursorMovement;
-    QList<MenuButton> m_buttons;
+    QList<dvd::MenuButton> m_buttons;
 };
 
 #endif // VIDEOWIDGET_H

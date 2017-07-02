@@ -20,7 +20,7 @@ VideoWidget::~VideoWidget()
 
 }
 
-void VideoWidget::buttons( QList<MenuButton> const& buttons )
+void VideoWidget::buttons( QList<dvd::MenuButton> const& buttons )
 {
 //    std::cout << "Got " << buttons.length() << " buttons!" << std::endl;
     m_buttons = buttons;
@@ -44,7 +44,7 @@ void VideoWidget::mousePressEvent( QMouseEvent* e )
 
     // Cycle through our buttons
     QCursor c( cursor() );
-    foreach ( MenuButton btn, m_buttons )
+    for ( dvd::MenuButton btn : m_buttons )
     {
         if ( btn.mapToScreen(size()).contains(QWidget::mapFromGlobal(c.pos())) )
         {
@@ -68,10 +68,10 @@ void VideoWidget::cursorSpy()
         m_lastCursorMovement.start();
         m_lastCursorPosition = c.pos();
 
-        MenuButton selected;
+        dvd::MenuButton selected;
 
         // Cycle through our buttons
-        foreach ( MenuButton btn, m_buttons )
+        for ( dvd::MenuButton btn : m_buttons )
         {
             if ( btn.mapToScreen(size()).contains( QWidget::mapFromGlobal(c.pos()) ) )
             {
