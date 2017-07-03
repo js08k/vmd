@@ -44,6 +44,7 @@ bool dvd::MediaInput::initialize( QString const& name )
 #include "dvd/mediacontext.h"
 #include "dvd/dvdcontext.h"
 #include "dvd/mpegcontext.h"
+#include "dvd/networkcontext.h"
 dvd::MediaContext* dvd::MediaInput::create( QObject* parent ) const
 {
     switch ( m_type )
@@ -57,7 +58,8 @@ dvd::MediaContext* dvd::MediaInput::create( QObject* parent ) const
         return new dvd::MPEGContext(parent);
         break;
     case dvd::TypePeer:
-        std::cout << "Would create a dvd::NetworkContext" << std::endl;
+        std::cout << "Creating a dvd::NetworkContext" << std::endl;
+        return new dvd::NetworkContext(parent);
         break;
     case dvd::TypeUnknown:
         std::cout << "Could not determine the context type" << std::endl;

@@ -40,11 +40,13 @@ LIBS += \
 SOURCES += \
     main.cpp \
     vmd.cpp \
-    netinspector.cpp
+    netinspector.cpp \
+    connectionmanager.cpp
 
 HEADERS  += \
     vmd.h \
-    netinspector.h
+    netinspector.h \
+    connectionmanager.h
 
 FORMS    += \
     vmd.ui

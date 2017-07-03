@@ -22,7 +22,6 @@ VideoWidget::~VideoWidget()
 
 void VideoWidget::buttons( QList<dvd::MenuButton> const& buttons )
 {
-//    std::cout << "Got " << buttons.length() << " buttons!" << std::endl;
     m_buttons = buttons;
     update();
 }
@@ -31,10 +30,6 @@ void VideoWidget::mouseMoveEvent( QMouseEvent* event )
 {
 //    std::cout << "MouseTracking: " << testAttribute(Qt::WA_MouseTracking) << std::endl;
     QWidget::mouseMoveEvent(event);
-
-//    std::cout << "VideoWidget: mouseMoveEvent ("
-//              << event->x() << "," << event->y()
-//              << ")" <<std::endl;
 }
 
 void VideoWidget::mousePressEvent( QMouseEvent* e )
@@ -82,11 +77,14 @@ void VideoWidget::cursorSpy()
 
         // Set the cursor to default if it was non default
         if ( selected.isNull() )
+        {
             setCursor( QCursor() );
+        }
         else
+        {
             setCursor( QCursor(Qt::PointingHandCursor) );
-
-        emit highlight(selected);
+            emit highlight(selected);
+        }
     }
     else if ( m_lastCursorMovement.elapsed() > 5000 )
     {

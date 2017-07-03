@@ -2,9 +2,11 @@
 
 // Project Includes
 #include "dvd/dvd.h"
+#include "dvd/menubutton.h"
 
 // Qt Includes
 #include <QObject>
+#include <QVector>
 
 class DVDSHARED_EXPORT dvd::MediaContext
         : public QObject
@@ -20,6 +22,7 @@ signals:
     void title(QString const& ) const;
     void stream(dvd::MediaFrame const& ) const;
     void mediaStateChange(dvd::MediaState const&) const;
+    void buttons(QVector<dvd::MenuButton> const&) const;
 
 public slots:
     virtual void pauseStream() = 0;

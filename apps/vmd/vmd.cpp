@@ -3,6 +3,8 @@
 
 #include "peerlink.h"
 #include "tcpsocket.h"
+#include "dvd/streamplayer.h"
+#include "dvd/mediainput.h"
 
 #include <QRegExp>
 #include <QHostAddress>
@@ -22,22 +24,14 @@ VMD::VMD(QWidget *parent)
     , m_addrregexp("^(\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}):(\\d+)$")
     , m_link( new gtqt::PeerLink(this) )
     , m_mediaThread( new QThread )
-    , m_context(0)
     , m_player(0)
+    , m_context(0)
 {
     // Setup the Ui
     ui->setupUi(this);
 
-    // Move the MediaContext to a thread, and start the thread
-//    m_mediaContext->moveToThread(m_mediaThread);
-//    m_mediaThread->start();
-
-//    connect( &m_buffer, SIGNAL(pauseReadStream()), m_mediaContext, SLOT(pause()) );
-//    connect( &m_buffer, SIGNAL(resumeReadStream()), m_mediaContext, SLOT(resume()) );
-//    connect( m_mediaContext, SIGNAL(stream(QByteArray,dvd::StreamAction)),
-//             &m_buffer, SLOT(stream(QByteArray,dvd::StreamAction)) );
-
-
+    // Start the media thread
+    m_mediaThread->start();
 
     m_settings.beginGroup("gui");
 
@@ -114,10 +108,17 @@ VMD::~VMD()
 {
 
     // Stop the media thread and wait for the thread to join
-    m_context->deleteLater();
-    m_mediaThread->quit();
-    m_mediaThread->wait();
-    delete m_mediaThread;
+    if ( m_context )
+    {
+        m_context->deleteLater();
+    }
+
+    if ( m_mediaThread )
+    {
+        m_mediaThread->quit();
+        m_mediaThread->wait();
+        delete m_mediaThread;
+    }
 
     delete ui;
     m_settings.sync();
@@ -281,8 +282,7 @@ void VMD::clickPushButtonRemove()
 
     m_settings.setValue("listWidgetLibrary", list);
 }
-#include "dvd/streamplayer.h"
-#include "dvd/mediainput.h"
+
 void VMD::clickPushButtonLoad()
 {
     QList<QListWidgetItem*> items(ui->listWidgetLibrary->selectedItems());
@@ -301,6 +301,8 @@ void VMD::clickPushButtonLoad()
         m_context = input.create(this);
         if ( m_context )
         {
+            m_context->moveToThread( m_mediaThread );
+
             if ( m_player )
             { delete m_player; }
 
@@ -409,6 +411,11 @@ void VMD::receive( gtqt::DataPackage<gtqt::ClientType1> const& msg )
 
 void VMD::receive( gtqt::DataPackage<gtqt::MediaInfo> const& msg )
 {
+    static QString const base( "peer://%1/%2" );
+    QString label = base.arg(QString(msg->title().c_str()), QString(msg->key().c_str()) );
+    ui->listWidgetLibrary->addItem(label);
+
+//    ui->listWidgetLibrary->addItem();
     std::cout << "Received gtqt::MediaInfo" << std::endl;
     std::cout << "Title: '" << msg->title() << "'" << std::endl;
     std::cout << "Key:   '" << msg->key() << "'" << std::endl;

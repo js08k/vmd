@@ -57,10 +57,8 @@ private:
     gtqt::PeerLink* m_link;
 
     QThread* m_mediaThread;
-    dvd::MediaContext* m_context;
-//    QMediaPlayer* m_player;
-//    StreamBuffer m_buffer;
     dvd::StreamPlayer* m_player;
+    dvd::MediaContext* m_context;
 };
 
 #endif // VMD_H

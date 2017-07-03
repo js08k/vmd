@@ -11,9 +11,10 @@ interface MediaContext {
 -MediaState m_state
 
 -- signals --
-+{abstract}stream(MediaFrame) = 0
-+{abstract}title(QString) = 0
-+{abstract}mediaStateChange(MediaState) = 0
++stream(MediaFrame)
++title(QString)
++mediaStateChange(MediaState)
++buttons(QVector<MenuButton>)
 
 -- slots --
 +{abstract}pauseStream() = 0
@@ -31,7 +32,7 @@ dvd::MediaContext::MediaContext(QObject* parent)
     : QObject(parent)
     , m_state(dvd::NotAvailable)
 {
-
+    qRegisterMetaType<QVector<dvd::MenuButton>>("QVector<dvd::MenuButton>");
 }
 
 dvd::MediaContext::~MediaContext()

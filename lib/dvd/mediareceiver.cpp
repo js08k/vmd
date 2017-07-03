@@ -22,3 +22,40 @@ class MediaReceiver {
 @enduml
 */
 #include "dvd/mediareceiver.h"
+#include <iostream>
+
+dvd::MediaReceiver::MediaReceiver(QObject* parent)
+    : dvd::MediaContext(parent)
+{
+
+}
+
+void dvd::MediaReceiver::receive( dvd::MediaFrame const& )
+{
+    std::cout << "dvd::MediaReceiver::receive()" << std::endl;
+}
+
+void dvd::MediaReceiver::pauseStream()
+{
+    std::cout << "dvd::MediaReceiver::pauseStream()" << std::endl;
+}
+
+void dvd::MediaReceiver::resumeStream()
+{
+    std::cout << "dvd::MediaReceiver::resumeStream()" << std::endl;
+}
+
+void dvd::MediaReceiver::menu()
+{
+    std::cout << "dvd::MediaReceiver::menu()" << std::endl;
+}
+
+void dvd::MediaReceiver::highlight(dvd::MenuButton const&)
+{
+    std::cout << "dvd::MediaReceiver::highlight()" << std::endl;
+}
+
+void dvd::MediaReceiver::activate(dvd::MenuButton const&)
+{
+    std::cout << "dvd::MediaReceiver::activate()" << std::endl;
+}

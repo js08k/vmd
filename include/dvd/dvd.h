@@ -15,13 +15,15 @@ namespace dvd
     // Forward class declarations
     class MenuButton;
     class MediaFrame;
-    class DvDContext;
     class DvDInterface;
     class StreamInterface;
-    class MediaContext;
     class MediaSender;
-    class MPEGContext;
+    class MediaReceiver;
     class StreamBuffer;
+    class MediaContext;
+    class DvDContext;
+    class MPEGContext;
+    class NetworkContext;
 
     // Enum type declarations
     enum MediaState

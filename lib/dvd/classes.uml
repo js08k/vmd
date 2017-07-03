@@ -16,6 +16,6 @@ when a NetworkContext plays\n\
 and a DvDContext calls pause\n\
 on the same source stream.
 
-MediaSender <--> MediaReceiver : Comms Via Network
+'MediaSender <--> MediaReceiver : Comms Via Network'
 
 @enduml
