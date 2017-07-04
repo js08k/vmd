@@ -127,6 +127,7 @@ void VMD::listen(QHostAddress const& address, quint16 port)
 {
     static QString const msg("Listening on %1:%2");
     std::cout << msg.arg(address.toString(),QString::number(port)).toStdString() << std::endl;
+    m_link->listen(address,port);
 }
 
 void VMD::lineEditUserNameFinished()
@@ -296,6 +297,11 @@ void VMD::clickPushButtonLoad()
         if ( m_context )
         {
             m_context->moveToThread( m_mediaThread );
+
+            gtqt::MediaInfo info;
+            info.set_key( "mykey" );
+            info.set_title( input.name().toStdString() );
+            m_link->transmit(gtqt::DataPackage<gtqt::MediaInfo>(info));
 
             if ( m_player )
             { delete m_player; }

@@ -27,6 +27,7 @@ signals:
 private slots:
     void connected(QHostAddress const&, quint16);
     void disconnected(QHostAddress const&, quint16);
+    void error(QAbstractSocket::SocketError e);
 
     void receive( gtqt::DataPackage<gtqt::NetPing> );
 
