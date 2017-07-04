@@ -13,6 +13,7 @@ namespace gtqt { class PeerLink; }
 class QHostAddress;
 class QThread;
 class QMediaPlayer;
+class ConnectionManager;
 
 namespace dvd { class StreamPlayer; }
 
@@ -41,20 +42,17 @@ private slots:
 
     void setTitle( QString const& title );
 
-    void receive( gtqt::DataPackage<gtqt::ClientType1> const& );
     void receive( gtqt::DataPackage<gtqt::MediaInfo> const& );
-
-    void timeout();
 
 private:
     void listen(QHostAddress const&, quint16 port);
 
 private:
     Ui::VMD *ui;
+    ConnectionManager* m_link;
     QSettings m_settings;
 
     QString const m_addrregexp;
-    gtqt::PeerLink* m_link;
 
     QThread* m_mediaThread;
     dvd::StreamPlayer* m_player;

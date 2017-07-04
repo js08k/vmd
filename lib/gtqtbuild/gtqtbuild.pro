@@ -37,8 +37,6 @@ GTQT_DESTDIR = $${OUT_PWD}
 
 # Google protocol buffer IDL files
 PROTOS = \
-    example1.proto \
-    example2.proto \
     auth.proto \
     #sync.proto \
     #library.proto

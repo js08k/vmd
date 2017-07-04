@@ -7,8 +7,7 @@
 
 #include "message.h"
 #include "datapackage.h"
-
-namespace gtqt { class PeerLink; }
+#include "peerlink.h"
 
 class ConnectionManager
         : public QObject
@@ -20,26 +19,37 @@ public:
     void listen(QHostAddress const&, quint16 port);
     void connectToHost(QHostAddress const&, quint16 port);
 
-signals:
+    template <typename T>
+    inline void transmit( T const& ) const;
 
-public slots:
+signals:
+    void receive( gtqt::DataPackage<gtqt::MediaInfo> const& ) const;
 
 private slots:
+    void connected(QHostAddress const&, quint16);
+    void disconnected(QHostAddress const&, quint16);
+
     void receive( gtqt::DataPackage<gtqt::NetPing> );
 
 private:
+    gtqt::PeerLink* m_link;
+
     struct Peer
     {
+        bool connected;
         QHostAddress address;
         quint16 port;
-    };
-
-    gtqt::PeerLink* m_link;
-    bool m_connected;
-    QVector<Peer> m_peers;
+    } m_peer;
 };
 
 bool ConnectionManager::connected() const
-{ return bool(m_peers.length() > 0); }
+{ return m_peer.connected; }
+
+template <typename T>
+void ConnectionManager::transmit( T const& data ) const
+{
+    if ( m_peer.connected )
+    { m_link->transmit(data); }
+}
 
 #endif // CONNECTIONMANAGER_H

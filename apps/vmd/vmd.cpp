@@ -1,5 +1,6 @@
 #include "vmd.h"
 #include "ui_vmd.h"
+#include "connectionmanager.h"
 
 #include "peerlink.h"
 #include "tcpsocket.h"
@@ -21,8 +22,8 @@
 VMD::VMD(QWidget *parent)
     : QWidget(parent)
     , ui(new Ui::VMD)
+    , m_link(new ConnectionManager(this))
     , m_addrregexp("^(\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}):(\\d+)$")
-    , m_link( new gtqt::PeerLink(this) )
     , m_mediaThread( new QThread )
     , m_player(0)
     , m_context(0)
@@ -87,8 +88,6 @@ VMD::VMD(QWidget *parent)
     connect( ui->pushButtonPausePlay, SIGNAL(clicked()),
              this, SLOT(clickPushButtonPlayPause()) );
 
-    connect( m_link, SIGNAL(receive(gtqt::DataPackage<gtqt::ClientType1>)),
-           this, SLOT(receive(gtqt::DataPackage<gtqt::ClientType1>)) );
     connect( m_link, SIGNAL(receive(gtqt::DataPackage<gtqt::MediaInfo>)),
              this, SLOT(receive(gtqt::DataPackage<gtqt::MediaInfo>)) );
 
@@ -126,9 +125,6 @@ VMD::~VMD()
 
 void VMD::listen(QHostAddress const& address, quint16 port)
 {
-    m_link->close();
-    m_link->listen( address, port );
-
     static QString const msg("Listening on %1:%2");
     std::cout << msg.arg(address.toString(),QString::number(port)).toStdString() << std::endl;
 }
@@ -232,9 +228,7 @@ void VMD::clickPushButtonConnect()
     {
         QHostAddress const host( regexp.cap(1) );
         quint16 const port( regexp.cap(2).toInt() );
-        m_link->connectToHost( host, port );
-
-        QTimer::singleShot( 1000, this, SLOT(timeout()) );
+        m_link->connectToHost(host,port);
     }
 }
 
@@ -403,12 +397,6 @@ void VMD::setTitle( QString const& title )
     setWindowTitle(title);
 }
 
-void VMD::receive( gtqt::DataPackage<gtqt::ClientType1> const& msg )
-{
-    Q_UNUSED(msg)
-    std::cout << "Received gtqt::ClientType1" << std::endl;
-}
-
 void VMD::receive( gtqt::DataPackage<gtqt::MediaInfo> const& msg )
 {
     static QString const base( "peer://%1/%2" );
@@ -419,13 +407,5 @@ void VMD::receive( gtqt::DataPackage<gtqt::MediaInfo> const& msg )
     std::cout << "Received gtqt::MediaInfo" << std::endl;
     std::cout << "Title: '" << msg->title() << "'" << std::endl;
     std::cout << "Key:   '" << msg->key() << "'" << std::endl;
-}
-
-void VMD::timeout()
-{
-    std::cout << "TIMEOUT! Sending gtqt::PeerInformation" << std::endl;
-    gtqt::DataPackage<gtqt::ClientType1> msg;
-    msg.data()->set_data( qPrintable("Test Message") );
-    m_link->transmit(msg);
 }
 
