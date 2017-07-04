@@ -4,9 +4,9 @@ SUBDIRS += \
     gtqtbuild \
     util \
     dvd \
-    dvdread \
-    dvdnav \
-    dvdcss \
+#    dvdread \
+#    dvdnav \
+#    dvdcss \
 #    protobuf
 
 dvd.depends += gtqtbuild
