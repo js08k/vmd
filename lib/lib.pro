@@ -4,10 +4,7 @@ SUBDIRS += \
     gtqtbuild \
     util \
     dvd \
-#    dvdread \
-#    dvdnav \
-#    dvdcss \
-#    protobuf
+    guiUtil
 
 dvd.depends += gtqtbuild
 dvd.subdir = dvd

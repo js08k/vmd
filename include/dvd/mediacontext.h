@@ -20,6 +20,7 @@ public:
 
 signals:
     void title(QString const& ) const;
+    void resolution(QSizeF const&) const;
     void stream(dvd::MediaFrame const& ) const;
     void mediaStateChange(dvd::MediaState const&) const;
     void buttons(QVector<dvd::MenuButton> const&) const;

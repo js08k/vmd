@@ -32,7 +32,7 @@
    <item>
     <widget class="QTabWidget" name="tabWidgetMain">
      <property name="currentIndex">
-      <number>1</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="media">
       <attribute name="title">
@@ -55,20 +55,7 @@
         <number>2</number>
        </property>
        <item>
-        <widget class="VideoWidget" name="widgetVideo" native="true">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="minimumSize">
-          <size>
-           <width>720</width>
-           <height>480</height>
-          </size>
-         </property>
-        </widget>
+        <widget class="dvd::VideoWidget" name="widgetVideo"/>
        </item>
        <item>
         <layout class="QHBoxLayout" name="horizontalLayout_2">
@@ -471,10 +458,9 @@
  <layoutdefault spacing="6" margin="11"/>
  <customwidgets>
   <customwidget>
-   <class>VideoWidget</class>
-   <extends>QWidget</extends>
-   <header>dvd/VideoWidget.h</header>
-   <container>1</container>
+   <class>dvd::VideoWidget</class>
+   <extends>QGraphicsView</extends>
+   <header>guiUtil/videowidget.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

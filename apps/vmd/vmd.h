@@ -43,15 +43,24 @@ private slots:
     void setTitle( QString const& title );
 
     void receive( gtqt::DataPackage<gtqt::MediaInfo> const& );
+    void receive( gtqt::DataPackage<gtqt::StreamRequest> const& );
 
 private:
     void listen(QHostAddress const&, quint16 port);
 
 private:
     Ui::VMD *ui;
-    LinkManager* m_link;
-    QSettings m_settings;
 
+    LinkManager* m_link;
+
+    // Logical Grouping for containing the MediaInfo
+    struct
+    {
+        bool isNull;
+        gtqt::MediaInfo msg;
+    } m_mediainfo;
+
+    QSettings m_settings;
     QString const m_addrregexp;
 
     QThread* m_mediaThread;

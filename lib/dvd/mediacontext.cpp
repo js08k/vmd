@@ -13,6 +13,7 @@ interface MediaContext {
 -- signals --
 +stream(MediaFrame)
 +title(QString)
++resolution(QSizeF)
 +mediaStateChange(MediaState)
 +buttons(QVector<MenuButton>)
 

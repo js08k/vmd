@@ -28,6 +28,9 @@ VMD::VMD(QWidget *parent)
     , m_player(0)
     , m_context(0)
 {
+    // Default the MediaInfo validity
+    m_mediainfo.isNull = true;
+
     // Setup the Ui
     ui->setupUi(this);
 
@@ -286,6 +289,11 @@ void VMD::clickPushButtonLoad()
     dvd::MediaInput input;
     if ( input.initialize( items.first()->text() ) )
     {
+        // Set the MediaInfo
+        m_mediainfo.isNull = false;
+        m_mediainfo.msg.set_key( "mykey" );
+        m_mediainfo.msg.set_title( input.name().toStdString() );
+
         std::cout << "New style media type deyphering" << std::endl;
 
         // Delete the previous context
@@ -298,16 +306,16 @@ void VMD::clickPushButtonLoad()
         {
             m_context->moveToThread( m_mediaThread );
 
-            gtqt::MediaInfo info;
-            info.set_key( "mykey" );
-            info.set_title( input.name().toStdString() );
-            m_link->transmit(gtqt::DataPackage<gtqt::MediaInfo>(info));
+            m_link->transmit(gtqt::DataPackage<gtqt::MediaInfo>(m_mediainfo.msg));
 
             if ( m_player )
             { delete m_player; }
 
             m_player = new dvd::StreamPlayer(this);
             m_player->setVideoOutput(ui->widgetVideo->device());
+
+            connect( m_context, SIGNAL(resolution(QSizeF)),
+                     ui->widgetVideo, SLOT(resolution(QSizeF)) );
 
             connect( m_player, SIGNAL(pauseReadStream()),
                      m_context, SLOT(pauseStream()) );
@@ -332,42 +340,6 @@ void VMD::clickPushButtonLoad()
 
             m_context->open( input.path() );
         }
-    }
-    else
-    {
-        if ( !m_context )
-        {
-            m_context = new dvd::DvDContext(this);
-            connect( ui->widgetVideo, SIGNAL(highlight(dvd::MenuButton)),
-                     m_context, SLOT(highlight(dvd::MenuButton)) );
-            connect( ui->widgetVideo, SIGNAL(activate(dvd::MenuButton)),
-                     m_context, SLOT(activate(dvd::MenuButton)) );
-            connect( m_context, SIGNAL(buttons(QList<dvd::MenuButton>)),
-                     ui->widgetVideo, SLOT(buttons(QList<dvd::MenuButton>)) );
-            connect( m_context, SIGNAL(title(QString)),
-                     this, SLOT(setTitle(QString)) );
-        }
-
-        m_context->open( items.first()->text() );
-
-        if ( m_player )
-        { delete m_player; }
-
-        m_player = new dvd::StreamPlayer(this);
-        m_player->setVideoOutput(ui->widgetVideo->device());
-
-        connect( m_player, SIGNAL(pauseReadStream()),
-                 m_context, SLOT(pauseStream()) );
-        connect( m_player, SIGNAL(resumeReadStream()),
-                 m_context, SLOT(resumeStream()) );
-        connect( m_context, SIGNAL(stream(dvd::MediaFrame)),
-                 m_player, SLOT(stream(dvd::MediaFrame)) );
-
-    //    m_player = new QMediaPlayer(this, QMediaPlayer::StreamPlayback );
-    //    m_player->setMedia( QMediaContent(), &m_buffer );
-    //    m_player->setVideoOutput(ui->widgetVideo);
-    //    connect( &m_buffer, SIGNAL(ready()), m_player, SLOT(play()) );
-
     }
 
     ui->pushButtonPausePlay->setText("Pause");
@@ -422,5 +394,18 @@ void VMD::receive( gtqt::DataPackage<gtqt::MediaInfo> const& msg )
     std::cout << "Received gtqt::MediaInfo" << std::endl;
     std::cout << "Title: '" << msg->title() << "'" << std::endl;
     std::cout << "Key:   '" << msg->key() << "'" << std::endl;
+}
+
+void VMD::receive( gtqt::DataPackage<gtqt::StreamRequest> const& msg )
+{
+    switch ( msg->action() )
+    {
+    case gtqt::StreamRequest::SendInfo:
+        if ( !m_mediainfo.isNull )
+            m_link->transmit(gtqt::DataPackage<gtqt::MediaInfo>(m_mediainfo.msg));
+        break;
+    default:
+        break;
+    }
 }
 

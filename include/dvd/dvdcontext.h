@@ -25,7 +25,6 @@ public:
     void open( QString const& device );
 
 signals:
-    void resolution( QSizeF const& ) const;
     void buttons( QList<dvd::MenuButton> const& ) const;
 
 public slots:
