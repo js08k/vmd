@@ -13,7 +13,7 @@ namespace gtqt { class PeerLink; }
 class QHostAddress;
 class QThread;
 class QMediaPlayer;
-class ConnectionManager;
+class LinkManager;
 
 namespace dvd { class StreamPlayer; }
 
@@ -49,7 +49,7 @@ private:
 
 private:
     Ui::VMD *ui;
-    ConnectionManager* m_link;
+    LinkManager* m_link;
     QSettings m_settings;
 
     QString const m_addrregexp;

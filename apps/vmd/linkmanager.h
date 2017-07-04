@@ -1,5 +1,4 @@
-#ifndef CONNECTIONMANAGER_H
-#define CONNECTIONMANAGER_H
+#pragma once
 
 #include <QObject>
 #include <QVector>
@@ -9,12 +8,12 @@
 #include "datapackage.h"
 #include "peerlink.h"
 
-class ConnectionManager
+class LinkManager
         : public QObject
 {
     Q_OBJECT
 public:
-    ConnectionManager(QObject* parent = 0);
+    LinkManager(QObject* parent = 0);
     inline bool connected() const;
     void listen(QHostAddress const&, quint16 port);
     void connectToHost(QHostAddress const&, quint16 port);
@@ -42,14 +41,12 @@ private:
     } m_peer;
 };
 
-bool ConnectionManager::connected() const
+bool LinkManager::connected() const
 { return m_peer.connected; }
 
 template <typename T>
-void ConnectionManager::transmit( T const& data ) const
+void LinkManager::transmit( T const& data ) const
 {
     if ( m_peer.connected )
     { m_link->transmit(data); }
 }
-
-#endif // CONNECTIONMANAGER_H

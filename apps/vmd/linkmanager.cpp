@@ -1,25 +1,25 @@
-#include "connectionmanager.h"
+#include "linkmanager.h"
 #include "peerlink.h"
 #include <iostream>
 
-ConnectionManager::ConnectionManager(QObject* parent)
+LinkManager::LinkManager(QObject* parent)
     : QObject(parent)
     , m_link( new gtqt::PeerLink(this) )
 {
     m_peer.connected = false;
 }
 
-void ConnectionManager::listen(QHostAddress const& addr, quint16 port )
+void LinkManager::listen(QHostAddress const& addr, quint16 port )
 {
     m_link->listen(addr,port);
 }
 
-void ConnectionManager::connectToHost(QHostAddress const& addr, quint16 port)
+void LinkManager::connectToHost(QHostAddress const& addr, quint16 port)
 {
     m_link->connectToHost(addr,port);
 }
 
-void ConnectionManager::connected(QHostAddress const& addr, quint16 port)
+void LinkManager::connected(QHostAddress const& addr, quint16 port)
 {
     std::cout << "Connected on " << addr.toString().toStdString()
               << ":" << port << std::endl;
@@ -33,7 +33,7 @@ void ConnectionManager::connected(QHostAddress const& addr, quint16 port)
     m_peer.port = port;
 }
 
-void ConnectionManager::disconnected(QHostAddress const& addr, quint16 port)
+void LinkManager::disconnected(QHostAddress const& addr, quint16 port)
 {
     std::cout << "Disconnected on " << addr.toString().toStdString()
               << ":" << port << std::endl;
@@ -45,7 +45,7 @@ void ConnectionManager::disconnected(QHostAddress const& addr, quint16 port)
     m_peer.connected = false;
 }
 
-void ConnectionManager::receive( gtqt::DataPackage<gtqt::NetPing> )
+void LinkManager::receive( gtqt::DataPackage<gtqt::NetPing> )
 {
 
 }

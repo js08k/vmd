@@ -41,12 +41,12 @@ SOURCES += \
     main.cpp \
     vmd.cpp \
     netinspector.cpp \
-    connectionmanager.cpp
+    linkmanager.cpp
 
 HEADERS  += \
     vmd.h \
     netinspector.h \
-    connectionmanager.h
+    linkmanager.h
 
 FORMS    += \
     vmd.ui

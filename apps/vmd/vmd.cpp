@@ -1,6 +1,6 @@
 #include "vmd.h"
 #include "ui_vmd.h"
-#include "connectionmanager.h"
+#include "linkmanager.h"
 
 #include "peerlink.h"
 #include "tcpsocket.h"
@@ -22,7 +22,7 @@
 VMD::VMD(QWidget *parent)
     : QWidget(parent)
     , ui(new Ui::VMD)
-    , m_link(new ConnectionManager(this))
+    , m_link(new LinkManager(this))
     , m_addrregexp("^(\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}):(\\d+)$")
     , m_mediaThread( new QThread )
     , m_player(0)
