@@ -1,12 +1,20 @@
 #include "dvd/mediainput.h"
-#include <iostream>
 
-// libDvDRead
+// Project Includes
+#include "dvd/mediacontext.h"
+#include "dvd/dvdcontext.h"
+#include "dvd/mpegcontext.h"
+#include "dvd/networkcontext.h"
+
+// External Includes
 #include "dvdread/dvd_reader.h"
 
 // Qt Includes
 #include <QRegExp>
 #include <QFileInfo>
+
+// std includes
+#include <iostream>
 
 dvd::MediaInput::MediaInput()
     : m_type(TypeUnknown)
@@ -41,10 +49,7 @@ bool dvd::MediaInput::initialize( QString const& name )
 
     return false;
 }
-#include "dvd/mediacontext.h"
-#include "dvd/dvdcontext.h"
-#include "dvd/mpegcontext.h"
-#include "dvd/networkcontext.h"
+
 dvd::MediaContext* dvd::MediaInput::create( QObject* parent ) const
 {
     switch ( m_type )
@@ -114,22 +119,14 @@ bool dvd::MediaInput::tryFile( QString const& dev )
 
 bool dvd::MediaInput::tryPeer( QString const& dev )
 {
-    QRegExp exp( "^((?:\\d{1,3}\\.){3}\\d{1,3}):(\\d+)/(\\S+)$" );
+    QRegExp exp( "^\\S+/(\\S+)$" );
 
     if ( exp.indexIn(dev) >= 0 )
     {
-        QString address( exp.cap(1) );
-        quint16 port( exp.cap(2).toUShort() );
-
-        Q_UNUSED(address);
-        Q_UNUSED(port);
-
-        m_name = exp.cap(3);
-
-        std::cout << exp.cap(1).toStdString() << std::endl;
-        std::cout << exp.cap(2).toStdString() << std::endl;
-        std::cout << exp.cap(3).toStdString() << std::endl;
         m_type = dvd::TypePeer;
+        m_name = exp.cap(1);
+        QString key = exp.cap(2);
+        Q_UNUSED( key )
 
         return true;
     }

@@ -307,7 +307,7 @@ void VMD::clickPushButtonLoad()
             { delete m_player; }
 
             m_player = new dvd::StreamPlayer(this);
-            m_player->setVideoOutput(ui->widgetVideo);
+            m_player->setVideoOutput(ui->widgetVideo->device());
 
             connect( m_player, SIGNAL(pauseReadStream()),
                      m_context, SLOT(pauseStream()) );
@@ -354,7 +354,7 @@ void VMD::clickPushButtonLoad()
         { delete m_player; }
 
         m_player = new dvd::StreamPlayer(this);
-        m_player->setVideoOutput(ui->widgetVideo);
+        m_player->setVideoOutput(ui->widgetVideo->device());
 
         connect( m_player, SIGNAL(pauseReadStream()),
                  m_context, SLOT(pauseStream()) );
@@ -405,11 +405,20 @@ void VMD::setTitle( QString const& title )
 
 void VMD::receive( gtqt::DataPackage<gtqt::MediaInfo> const& msg )
 {
-    static QString const base( "peer://%1/%2" );
-    QString label = base.arg(QString(msg->title().c_str()), QString(msg->key().c_str()) );
-    ui->listWidgetLibrary->addItem(label);
+    static QString const base( "peer://" );
+    QList<QListWidgetItem*> items = ui->listWidgetLibrary->findItems( base, Qt::MatchContains );
 
-//    ui->listWidgetLibrary->addItem();
+    QString label = base + msg->title().c_str() + "/" + msg->key().c_str();
+
+    if ( items.length() > 0 )
+    {
+        items.first()->setText( label );
+    }
+    else
+    {
+        ui->listWidgetLibrary->addItem(label);
+    }
+
     std::cout << "Received gtqt::MediaInfo" << std::endl;
     std::cout << "Title: '" << msg->title() << "'" << std::endl;
     std::cout << "Key:   '" << msg->key() << "'" << std::endl;

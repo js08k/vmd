@@ -8,27 +8,72 @@
 #include <QPainter>
 #include "dvd/menubutton.h"
 #include <iostream>
+#include <QPalette>
 
-VideoWidget::VideoWidget(QWidget* parent)
-    : QVideoWidget(parent)
+namespace dvd { class UiOverlay; }
+
+void dvd::UiOverlay::paint(QPainter* p, QStyleOptionGraphicsItem const*, QWidget* w)
 {
-    cursorSpy();
+    p->setPen( Qt::yellow );
+
+    for (dvd::MenuButton button : m_buttons)
+    {
+        p->setPen(Qt::red);
+        p->drawRect( button.mapToScreen(m_rect.size()));
+    }
 }
 
-VideoWidget::~VideoWidget()
+QRectF dvd::UiOverlay::boundingRect() const
 {
+    return m_rect;
+}
 
+void dvd::UiOverlay::setRect( QRect r )
+{
+    m_rect = r;
+}
+
+void dvd::UiOverlay::buttons( QList<dvd::MenuButton> const& buttons )
+{
+    m_buttons = buttons;
+}
+
+
+QWidget* m_uioverlay;
+
+VideoWidget::VideoWidget(QWidget* parent)
+    : QGraphicsView(parent)
+    , m_vOutput( new QGraphicsVideoItem )
+    , m_uioverlay( new dvd::UiOverlay )
+{
+    // Create and set the scene
+    setScene( new QGraphicsScene(this) );
+    scene()->setSceneRect( rect() );
+
+    // Add the video item to the scene
+    connect( m_vOutput, SIGNAL(nativeSizeChanged(QSizeF)), SLOT(videoNativeSizeChanged(QSizeF)) );
+    scene()->addItem(m_vOutput);
+
+    // Add the ui overlay to the scene
+    scene()->addItem(m_uioverlay);
+    m_uioverlay->setRect( rect() );
 }
 
 void VideoWidget::buttons( QList<dvd::MenuButton> const& buttons )
 {
+    m_uioverlay->buttons(buttons);
     m_buttons = buttons;
     update();
 }
 
+void VideoWidget::resizeEvent(QResizeEvent* e)
+{
+    QGraphicsView::resizeEvent(e);
+}
+
 void VideoWidget::mouseMoveEvent( QMouseEvent* event )
 {
-//    std::cout << "MouseTracking: " << testAttribute(Qt::WA_MouseTracking) << std::endl;
+    std::cout << "MouseTracking: " << testAttribute(Qt::WA_MouseTracking) << std::endl;
     QWidget::mouseMoveEvent(event);
 }
 
@@ -49,6 +94,7 @@ void VideoWidget::mousePressEvent( QMouseEvent* e )
         }
     }
 }
+
 #include <QRectF>
 void VideoWidget::cursorSpy()
 {
@@ -99,4 +145,12 @@ void VideoWidget::cursorSpy()
 
     // Check the cursor again in 'interval' mS
     QTimer::singleShot( interval, this, SLOT(cursorSpy()) );
+}
+
+void VideoWidget::videoNativeSizeChanged( QSizeF size )
+{
+    setMinimumSize( size.toSize() );
+    scene()->setSceneRect( QRect( QPoint(0,0), size.toSize() ) );
+    m_vOutput->setSize( size );
+    m_uioverlay->setRect( QRect( QPoint(0,0), size.toSize() ) );
 }

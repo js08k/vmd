@@ -22,7 +22,11 @@ public:
     inline void transmit( T const& ) const;
 
 signals:
+    void isConnected() const;
+    void isDisconnected() const;
     void receive( gtqt::DataPackage<gtqt::MediaInfo> const& ) const;
+    void receive( gtqt::DataPackage<gtqt::MediaFrame> const& ) const;
+    void receive( gtqt::DataPackage<gtqt::StreamRequest> const& ) const;
 
 private slots:
     void connected(QHostAddress const&, quint16);

@@ -36,12 +36,19 @@ void LinkManager::connected(QHostAddress const& addr, quint16 port)
               << ":" << port << std::endl;
 
     if ( m_peer.connected )
+    {
         std::cerr << "ERROR: Already connected!" << std::endl;
+    }
+    else
+    {
+        // Set the connected flag, and the cooresponding data
+        m_peer.connected = true;
+        m_peer.address = addr;
+        m_peer.port = port;
 
-    // Set the connected flag, and the cooresponding data
-    m_peer.connected = true;
-    m_peer.address = addr;
-    m_peer.port = port;
+        // Emit the connected signal
+        emit isConnected();
+    }
 }
 
 void LinkManager::disconnected(QHostAddress const& addr, quint16 port)
@@ -50,18 +57,45 @@ void LinkManager::disconnected(QHostAddress const& addr, quint16 port)
               << ":" << port << std::endl;
 
     if ( !m_peer.connected )
+    {
         std::cerr << "ERROR: Was not connected!" << std::endl;
+    }
+    else
+    {
+        // Clear the connected flag
+        m_peer.connected = false;
 
-    // Clear the connected flag
-    m_peer.connected = false;
+        // Emit the disconnected signal
+        emit isDisconnected();
+    }
 }
 
 void LinkManager::error(QAbstractSocket::SocketError e)
 {
     std::cout << "Socket Error: " << e << std::endl;
+
+    if ( m_peer.connected )
+    {
+        std::cout << "Closing connection..." << std::endl;
+
+        // Disconnect in response to this error
+        m_link->close( m_peer.address, m_peer.port );
+    }
 }
 
 void LinkManager::receive( gtqt::DataPackage<gtqt::NetPing> )
 {
 
 }
+
+template <>
+void LinkManager::transmit<gtqt::DataPackage<gtqt::MediaFrame>>(
+        gtqt::DataPackage<gtqt::MediaFrame> const& data) const
+{
+    if ( m_peer.connected )
+    {
+        emit receive(data);
+        m_link->transmit(data);
+    }
+}
+
