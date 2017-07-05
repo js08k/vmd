@@ -36,7 +36,9 @@ LIBS += \
     -L$$OUT_PWD/../../lib/gtqtbuild -lgtqt \
     -L../../lib/dvd -ldvd \
     -L../../lib/guiUtil -lguiUtil \
-    -L/usr/local/libdvdcss/lib -ldvdcss
+    -L/usr/local/libdvdcss/lib -ldvdcss \
+    -L/usr/local/libdvdnav/lib -ldvdnav \
+    -L/usr/local/libdvdread/lib -ldvdread
 
 SOURCES += \
     main.cpp \
