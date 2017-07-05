@@ -39,8 +39,6 @@ private slots:
     void setReadStart();
 
 private:
-    dvd::MediaState m_state;
-
     dvdnav_t* m_handle;
     QString m_title;
     QTimer* m_loop;

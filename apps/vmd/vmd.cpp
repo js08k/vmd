@@ -315,7 +315,7 @@ void VMD::clickPushButtonLoad()
             m_player->setVideoOutput(ui->widgetVideo->device());
 
             connect( m_context, SIGNAL(resolution(QSizeF)),
-                     ui->widgetVideo, SLOT(resolution(QSizeF)) );
+                     this, SLOT(resolution(QSizeF)) );
 
             connect( m_player, SIGNAL(pauseReadStream()),
                      m_context, SLOT(pauseStream()) );
@@ -325,6 +325,9 @@ void VMD::clickPushButtonLoad()
 
             connect( m_context, SIGNAL(stream(dvd::MediaFrame)),
                      m_player, SLOT(stream(dvd::MediaFrame)) );
+
+            connect( m_context, SIGNAL(stream(dvd::MediaFrame)),
+                     m_link, SLOT(transmit(dvd::MediaFrame)) );
 
             connect( ui->widgetVideo, SIGNAL(highlight(dvd::MenuButton)),
                      m_context, SLOT(highlight(dvd::MenuButton)) );
@@ -375,25 +378,93 @@ void VMD::setTitle( QString const& title )
     setWindowTitle(title);
 }
 
+void VMD::resolution( QSizeF const& size )
+{
+    m_mediainfo.msg.set_width(size.width());
+    m_mediainfo.msg.set_height(size.height());
+
+    if ( !m_mediainfo.isNull && m_link->connected() )
+    {
+        m_link->transmit(gtqt::DataPackage<gtqt::MediaInfo>(m_mediainfo.msg));
+    }
+
+    ui->widgetVideo->resolution(size);
+}
+#include "dvd/networkcontext.h"
 void VMD::receive( gtqt::DataPackage<gtqt::MediaInfo> const& msg )
 {
-    static QString const base( "peer://" );
-    QList<QListWidgetItem*> items = ui->listWidgetLibrary->findItems( base, Qt::MatchContains );
+    // Do not accept the message without a title or key
+    if ( !msg->has_title() ) { return; }
+    if ( !msg->has_key() ) { return; }
 
-    QString label = base + msg->title().c_str() + "/" + msg->key().c_str();
-
-    if ( items.length() > 0 )
+    // Verify the mediainfo has not changed title
+    if ( !m_mediainfo.isNull &&
+         msg->title() != m_mediainfo.msg.title() )
     {
-        items.first()->setText( label );
-    }
-    else
-    {
-        ui->listWidgetLibrary->addItem(label);
+        m_mediainfo.isNull = true;
     }
 
-    std::cout << "Received gtqt::MediaInfo" << std::endl;
-    std::cout << "Title: '" << msg->title() << "'" << std::endl;
-    std::cout << "Key:   '" << msg->key() << "'" << std::endl;
+    // Copy the details of the message
+    m_mediainfo.msg.set_title( msg->title() );
+    m_mediainfo.msg.set_key( msg->key() );
+    if ( msg->has_width() ) { m_mediainfo.msg.set_width( msg->width() ); }
+    if ( msg->has_height() ) { m_mediainfo.msg.set_height( msg->height() ); }
+
+    // This media is new to us, setup the output
+    if ( m_mediainfo.isNull )
+    {
+        // Re-request the MediaInfo if we do not have heigh/width. This should
+        // be a one-time request
+        if ( !msg->has_height() || !msg->has_width() )
+        {
+            gtqt::DataPackage<gtqt::StreamRequest> request;
+            request.data()->set_action( gtqt::StreamRequest::SendInfo );
+            m_link->transmit( request );
+        }
+
+        // Set the Windowtitle to the peer stream title
+        setTitle( msg->title().c_str() );
+
+        // Delete the previous context
+        if ( m_context )
+        { delete m_context; }
+
+        // Create a new context according to the decyphered type
+        m_context = new dvd::NetworkContext(m_link);
+        if ( m_context )
+        {
+            // Get rid of the old player
+            if ( m_player )
+            { delete m_player; }
+
+            // Create a new player
+            m_player = new dvd::StreamPlayer(this);
+            m_player->setVideoOutput(ui->widgetVideo->device());
+
+            connect( m_context, SIGNAL(resolution(QSizeF)),
+                     this, SLOT(resolution(QSizeF)) );
+
+            connect( m_player, SIGNAL(pauseReadStream()),
+                     m_context, SLOT(pauseStream()) );
+
+            connect( m_player, SIGNAL(resumeReadStream()),
+                     m_context, SLOT(resumeStream()) );
+
+            connect( m_context, SIGNAL(stream(dvd::MediaFrame)),
+                     m_player, SLOT(stream(dvd::MediaFrame)) );
+
+            connect( ui->widgetVideo, SIGNAL(highlight(dvd::MenuButton)),
+                     m_context, SLOT(highlight(dvd::MenuButton)) );
+
+            connect( ui->widgetVideo, SIGNAL(activate(dvd::MenuButton)),
+                     m_context, SLOT(activate(dvd::MenuButton)) );
+
+            static_cast<dvd::NetworkContext*>(m_context)->receive(msg);
+
+            ui->pushButtonPausePlay->setText("Pause");
+            ui->tabWidgetMain->setCurrentIndex(0);
+        }
+    }
 }
 
 void VMD::receive( gtqt::DataPackage<gtqt::StreamRequest> const& msg )

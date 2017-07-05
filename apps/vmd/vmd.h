@@ -40,7 +40,8 @@ private slots:
     void clickPushButtonLoad();
     void clickPushButtonPlayPause();
 
-    void setTitle( QString const& title );
+    void setTitle( QString const& );
+    void resolution( QSizeF const& );
 
     void receive( gtqt::DataPackage<gtqt::MediaInfo> const& );
     void receive( gtqt::DataPackage<gtqt::StreamRequest> const& );

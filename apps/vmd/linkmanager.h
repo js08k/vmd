@@ -7,6 +7,7 @@
 #include "message.h"
 #include "datapackage.h"
 #include "peerlink.h"
+#include "dvd/MediaFrame.h"
 
 class LinkManager
         : public QObject
@@ -20,6 +21,13 @@ public:
 
     template <typename T>
     inline void transmit( T const& ) const;
+
+public slots:
+    void transmit( dvd::MediaFrame const& msg )
+    { transmit( gtqt::DataPackage<gtqt::MediaFrame>(msg) ); }
+
+    void transmit( gtqt::DataPackage<gtqt::StreamRequest> const& msg )
+    { m_link->transmit(msg); }
 
 signals:
     void isConnected() const;

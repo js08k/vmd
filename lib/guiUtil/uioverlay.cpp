@@ -49,7 +49,10 @@ void dvd::UiOverlay::setButtons( QList<dvd::MenuButton> const& buttons)
 
 void dvd::UiOverlay::cursorIsInactive()
 {
-    std::cout << "Cursor is inactive" << std::endl;
+    // Hide the cursor...
+    QPixmap pm(1,1);
+    pm.fill( Qt::transparent );
+    setCursor( QCursor(pm) );
 }
 
 void dvd::UiOverlay::hoverMoveEvent(QGraphicsSceneHoverEvent* e)

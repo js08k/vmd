@@ -25,9 +25,13 @@ public slots:
     void resolution( QSizeF const& );
     void buttons( QList<dvd::MenuButton> const& );
 
+private slots:
+    void cursorIsInactive();
+
 private:
     QGraphicsVideoItem* m_output;
     dvd::UiOverlay* m_overlay;
+    QTimer* m_cursorActiveTimer;
 };
 
 QGraphicsVideoItem* dvd::VideoWidget::device() const

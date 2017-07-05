@@ -36,7 +36,6 @@ class DvDContext {
 
 dvd::DvDContext::DvDContext(QObject* parent)
     : MediaSender(parent)
-    , m_state(dvd::NotAvailable)
     , m_handle(0)
     , m_title("UNKNOWN")
     , m_loop(new QTimer)
@@ -100,7 +99,7 @@ void dvd::DvDContext::open( QString const& device )
 
 void dvd::DvDContext::pauseStream()
 {
-    switch ( m_state )
+    switch ( state() )
     {
     case dvd::NotAvailable:
         break;
@@ -117,7 +116,7 @@ void dvd::DvDContext::pauseStream()
 
 void dvd::DvDContext::resumeStream()
 {
-    switch ( m_state )
+    switch ( state() )
     {
     case dvd::NotAvailable:
         break;
@@ -125,6 +124,7 @@ void dvd::DvDContext::resumeStream()
         break;
     case dvd::Loading:
         // Intentional fallthrough
+        break;
     case dvd::Idle:
         setMediaState(dvd::Reading);
         QTimer::singleShot(0,m_loop,SLOT(start()));
@@ -158,7 +158,7 @@ void dvd::DvDContext::loop()
         switch(event)
         {
         case DVDNAV_BLOCK_OK:
-            if ( m_state != dvd::Loading )
+            if ( state() != dvd::Loading )
             {
                 // Block streaming during the loading state
 
@@ -268,7 +268,7 @@ void dvd::DvDContext::loop()
         }
             break;
         case DVDNAV_HOP_CHANNEL:
-            if ( m_state == MediaState::Loading )
+            if ( state() == MediaState::Loading )
             {
                 // End of the open function, menu has been loaded
                 setMediaState( MediaState::Reading );

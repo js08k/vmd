@@ -17,6 +17,8 @@ LinkManager::LinkManager(QObject* parent)
 
     connect( m_link, SIGNAL(receive(gtqt::DataPackage<gtqt::MediaInfo>)),
              this, SIGNAL(receive(gtqt::DataPackage<gtqt::MediaInfo>)) );
+    connect( m_link, SIGNAL(receive(gtqt::DataPackage<gtqt::MediaFrame>)),
+             this, SIGNAL(receive(gtqt::DataPackage<gtqt::MediaFrame>)));
 }
 
 void LinkManager::listen(QHostAddress const& addr, quint16 port )
@@ -88,14 +90,4 @@ void LinkManager::receive( gtqt::DataPackage<gtqt::NetPing> )
 
 }
 
-template <>
-void LinkManager::transmit<gtqt::DataPackage<gtqt::MediaFrame>>(
-        gtqt::DataPackage<gtqt::MediaFrame> const& data) const
-{
-    if ( m_peer.connected )
-    {
-        emit receive(data);
-        m_link->transmit(data);
-    }
-}
 

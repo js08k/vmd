@@ -3,11 +3,13 @@
 
 #include <QGraphicsScene>
 #include <QGraphicsVideoItem>
+#include <QTimer>
 
 dvd::VideoWidget::VideoWidget(QWidget *parent)
     : QGraphicsView(parent)
     , m_output( new QGraphicsVideoItem )
     , m_overlay( new dvd::UiOverlay )
+    , m_cursorActiveTimer( new QTimer(this) )
 {
     // Create and set the scene
     setScene( new QGraphicsScene(this) );
@@ -24,8 +26,16 @@ dvd::VideoWidget::VideoWidget(QWidget *parent)
     // Finish construction/initialization of the overlay, and add to the scene
     m_overlay->setActivate([&](dvd::MenuButton btn){ emit activate(btn); });
     m_overlay->setHighlight([&](dvd::MenuButton btn){ emit highlight(btn); });
+    m_overlay->setCursorIsActive([&](){ m_cursorActiveTimer->start(); });
     m_overlay->setSize( size() );
     scene()->addItem(m_overlay);
+
+    // Configure and connect the timer to control the visibility of the
+    // cursor on the overlay
+    m_cursorActiveTimer->setInterval( 5000 );
+    m_cursorActiveTimer->setSingleShot(true);
+    connect( m_cursorActiveTimer, SIGNAL(timeout()),
+             this, SLOT(cursorIsInactive()) );
 }
 
 dvd::VideoWidget::~VideoWidget()
@@ -57,4 +67,9 @@ void dvd::VideoWidget::resolution( QSizeF const& size )
 void dvd::VideoWidget::buttons( QList<dvd::MenuButton> const& btns)
 {
     m_overlay->setButtons(btns);
+}
+
+void dvd::VideoWidget::cursorIsInactive()
+{
+    m_overlay->cursorIsInactive();
 }

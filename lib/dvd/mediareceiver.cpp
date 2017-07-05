@@ -32,11 +32,12 @@ dvd::MediaReceiver::MediaReceiver(QObject* parent)
 
 void dvd::MediaReceiver::receive( dvd::MediaFrame const& )
 {
-    std::cout << "dvd::MediaReceiver::receive()" << std::endl;
+
 }
 
 void dvd::MediaReceiver::pauseStream()
 {
+
     std::cout << "dvd::MediaReceiver::pauseStream()" << std::endl;
 }
 
