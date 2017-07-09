@@ -73,6 +73,6 @@ UML_SOURCE += \
     classes.uml \
     $$SOURCES
 
-include(../uml.pri)
+#include(../uml.pri)
 
 
