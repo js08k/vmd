@@ -6,6 +6,7 @@
 #include "tcpsocket.h"
 #include "dvd/streamplayer.h"
 #include "dvd/mediainput.h"
+#include "guiUtil/VideoWidget.h"
 
 #include <QRegExp>
 #include <QHostAddress>
@@ -312,7 +313,7 @@ void VMD::clickPushButtonLoad()
             { delete m_player; }
 
             m_player = new dvd::StreamPlayer(this);
-            m_player->setVideoOutput(ui->widgetVideo->device());
+            m_player->setVideoOutput(ui->widgetVideo);
 
             connect( m_context, SIGNAL(resolution(QSizeF)),
                      this, SLOT(resolution(QSizeF)) );
@@ -439,8 +440,7 @@ void VMD::receive( gtqt::DataPackage<gtqt::MediaInfo> const& msg )
 
             // Create a new player
             m_player = new dvd::StreamPlayer(this);
-            m_player->setVideoOutput(ui->widgetVideo->device());
-
+            m_player->setVideoOutput(ui->widgetVideo);
             connect( m_context, SIGNAL(resolution(QSizeF)),
                      this, SLOT(resolution(QSizeF)) );
 

@@ -25,9 +25,12 @@ INCLUDEPATH += \
     ../../include
 
 SOURCES += \
-    videowidget.cpp \
-    uioverlay.cpp
+    VideoWidget.cpp \
+    UiOverlay.cpp
 
 HEADERS += \
-    ../../include/guiUtil/videowidget.h \
-    ../../include/guiUtil/uioverlay.h
+    ../../include/guiUtil/VideoWidget.h \
+    ../../include/guiUtil/UiOverlay.h
+
+FORMS += \
+    uioverlay.ui

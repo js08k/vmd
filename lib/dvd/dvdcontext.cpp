@@ -149,6 +149,7 @@ void dvd::DvDContext::loop()
     int event, len;
     if ( dvdnav_get_next_block(m_handle, buffer_p, &event, &len) == DVDNAV_STATUS_ERR )
     {
+        std::cerr << "This is the error" << std::endl;
         std::cerr << "Error: " << dvdnav_err_to_string(m_handle) << std::endl;
         dvdnav_close(m_handle);
         m_handle = 0;

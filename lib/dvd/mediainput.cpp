@@ -47,6 +47,21 @@ bool dvd::MediaInput::initialize( QString const& name )
         return tryPeer(exp.cap(2));
     }
 
+    QRegExp ftype( "^\\S+[.](iso|mp4)" );
+    ftype.indexIn( name );
+
+    if ( ftype.cap(1) == "iso" )
+    {
+        m_path = name;
+        return tryDVD(name);
+    }
+    else if ( ftype.cap(1) == "mp4" )
+    {
+        m_path = name;
+        return tryFile(name);
+    }
+
+
     return false;
 }
 

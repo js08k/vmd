@@ -26,3 +26,9 @@ installer.subdir = installer
 OTHER_FILES += \
     README.md \
     Makefile
+
+HEADERS += \
+    include/guiUtil/videowidget2.h
+
+SOURCES += \
+    lib/guiUtil/videowidget2.cpp
