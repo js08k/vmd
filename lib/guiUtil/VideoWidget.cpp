@@ -13,6 +13,9 @@ gui::VideoWidget::VideoWidget(QWidget* parent)
     m_overlay->setVisible(true);
     setAspectRatioMode(Qt::IgnoreAspectRatio);
 
+    connect( m_overlay, SIGNAL(peerAddressChanged(QString)), this, SIGNAL(peerAddressChanged(QString)) );
+    connect( m_overlay, SIGNAL(hostAddressChanged(QString)), this, SIGNAL(hostAddressChanged(QString)) );
+    connect( m_overlay, SIGNAL(loadMedia(QString)), this, SIGNAL(loadMedia(QString)) );
     m_overlay->setActivate([&](dvd::MenuButton btn){ emit activate(btn); });
     m_overlay->setHighlight([&](dvd::MenuButton btn){ emit highlight(btn); });
     m_overlay->setCursorIsActive([&](){ m_cursorActiveTimer->start(); });
@@ -34,6 +37,16 @@ gui::VideoWidget::~VideoWidget()
         delete m_overlay;
         m_overlay = 0;
     }
+}
+
+void gui::VideoWidget::setPeerAddress( QString const& addr)
+{
+    m_overlay->setPeerAddress(addr);
+}
+
+void gui::VideoWidget::setHostAddress( QString const& addr)
+{
+    m_overlay->setHostAddress(addr);
 }
 
 void gui::VideoWidget::resolution(QSizeF const& size)
@@ -96,19 +109,19 @@ void gui::VideoWidget::resizeEvent(QResizeEvent* e)
 void gui::VideoWidget::focusOutEvent(QFocusEvent* e)
 {
     QVideoWidget::focusOutEvent(e);
-    if ( m_overlay )
-    { m_overlay->setVisible(false); }
+//    if ( m_overlay )
+//    { m_overlay->setVisible(false); }
 }
 
 void gui::VideoWidget::focusInEvent(QFocusEvent* e)
 {
     QVideoWidget::focusInEvent(e);
-    if ( m_overlay )
-    {
-        m_overlay->move( geometry().topLeft() );
-        m_overlay->resize(size());
-        m_overlay->setVisible(true);
-    }
+//    if ( m_overlay )
+//    {
+//        m_overlay->move( geometry().topLeft() );
+//        m_overlay->resize(size());
+//        m_overlay->setVisible(true);
+//    }
 }
 
 void gui::VideoWidget::cursorIsInactive()

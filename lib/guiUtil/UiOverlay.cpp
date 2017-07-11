@@ -27,9 +27,11 @@ gui::UiOverlay::UiOverlay(QWidget *parent)
     ui->pushButtonConnect->setVisible(false);
     ui->lineEditHostAddr->setVisible(false);
 
-    setWindowFlags( Qt::X11BypassWindowManagerHint );
+    setWindowFlags( Qt::Dialog );
     setAttribute(Qt::WA_TranslucentBackground, true);
     setAttribute(Qt::WA_MouseTracking, true);
+    setWindowFlag(Qt::WindowStaysOnTopHint );
+    setWindowFlag(Qt::FramelessWindowHint);
 
     // Initialize the ldvd button
     m_ldvd->resize( QSize(23,23) );
@@ -98,12 +100,14 @@ void gui::UiOverlay::loadClicked()
 
 void gui::UiOverlay::peerAddrEditingFinished()
 {
+    std::cout << "peerAddrEditingFinished: " << ui->lineEditPeerAddr->text().toStdString() << std::endl;
     emit peerAddressChanged( ui->lineEditPeerAddr->text() );
 }
 
 void gui::UiOverlay::hostAddrEditingFinished()
 {
-    emit peerAddressChanged( ui->lineEditHostAddr->text() );
+    std::cout << "hostAddrEditingFinished: " << ui->lineEditHostAddr->text().toStdString() << std::endl;
+    emit hostAddressChanged( ui->lineEditHostAddr->text() );
 }
 
 void gui::UiOverlay::resize( QSize size )
@@ -135,9 +139,10 @@ void gui::UiOverlay::paintEvent( QPaintEvent* e )
 
     QPainter painter(this);
 
-    painter.setBrush( Qt::transparent );
-    painter.setPen( Qt::red );
-    painter.drawRect( canvas );
+    painter.fillRect( canvas, Qt::transparent );
+//    painter.setBrush( Qt::transparent );
+//    painter.setPen( Qt::transparent );
+//    painter.drawRect( canvas );
 
     painter.setPen( Qt::blue );
     for ( dvd::MenuButton button : m_buttons )
@@ -222,12 +227,18 @@ void gui::UiOverlay::mouseMoveEvent( QMouseEvent* e )
 
 void gui::UiOverlay::mousePressEvent( QMouseEvent* e )
 {
-    for ( dvd::MenuButton const& btn : m_buttons )
+    if ( m_menu->isChecked() )
+    { }
+    else
     {
-        if ( btn.mapToScreen( size() ).contains(e->pos()) )
+        std::cout << "Press event!!!!" << std::endl;
+        for ( dvd::MenuButton const& btn : m_buttons )
         {
-            activate(btn);
-            break;
+            if ( btn.mapToScreen( size() ).contains(e->pos()) )
+            {
+                activate(btn);
+                break;
+            }
         }
     }
 }

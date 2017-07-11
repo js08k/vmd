@@ -15,6 +15,9 @@ public:
     ~VideoWidget();
     inline QMediaBindableInterface* device() const;
 
+    void setPeerAddress( QString const& );
+    void setHostAddress( QString const& );
+
 signals:
     void highlight( dvd::MenuButton const& ) const;
     void activate( dvd::MenuButton const& ) const;

@@ -1,9 +1,10 @@
-#include "vmd.h"
+//#include "vmd.h"
 #include <QApplication>
 #include <QSettings>
 #include "dvd/mediainput.h"
 #include "guiUtil/VideoWidget.h"
 #include <signal.h>
+#include "Vmd.h"
 
 #include <iostream>
 
@@ -26,6 +27,8 @@ int main(int argc, char *argv[])
     mainwindow.show();
 #else
     gui::VideoWidget vw;
+    gui::VMD vmd;
+    vmd.setVideoWidget(&vw);
     vw.show();
 #endif
 
