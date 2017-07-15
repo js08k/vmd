@@ -36,7 +36,6 @@ protected:
     void hideEvent(QHideEvent* e);
     void showEvent(QShowEvent* e);
     void resizeEvent(QResizeEvent* e);
-    void focusOutEvent(QFocusEvent* e);
     void focusInEvent(QFocusEvent* e);
 
 private slots:

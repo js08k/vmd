@@ -18,6 +18,7 @@ gui::UiOverlay::UiOverlay(QWidget *parent)
     , m_ldvd( new QPushButton(this) )
     , m_load( new QPushButton(this) )
     , m_menu( new QPushButton(this) )
+    , m_videowidget(0)
 {
     ui->setupUi(this);
 
@@ -56,6 +57,11 @@ gui::UiOverlay::UiOverlay(QWidget *parent)
 
 gui::UiOverlay::~UiOverlay()
 {
+}
+
+void gui::UiOverlay::setVideoWidget( gui::VideoWidget* widget )
+{
+    m_videowidget = widget;
 }
 
 void gui::UiOverlay::menuToggled(bool checked)
@@ -108,28 +114,6 @@ void gui::UiOverlay::hostAddrEditingFinished()
 {
     std::cout << "hostAddrEditingFinished: " << ui->lineEditHostAddr->text().toStdString() << std::endl;
     emit hostAddressChanged( ui->lineEditHostAddr->text() );
-}
-
-void gui::UiOverlay::resize( QSize size )
-{
-    qreal const buffer(10);
-
-    // Move the menu button
-    QRect menu( m_menu->rect() );
-    menu.moveTopRight( QPoint(size.width()-buffer, buffer) );
-    m_menu->move( menu.topLeft() );
-
-    // Move the load button
-    QRect load( m_load->rect() );
-    load.moveTopRight( QPoint(menu.left() - 2, buffer) );
-    m_load->move( load.topLeft() );
-
-    // Move the ldvd button
-    QRect ldvd( m_ldvd->rect() );
-    ldvd.moveTopRight( QPoint(load.left() - 2, buffer) );
-    m_ldvd->move( ldvd.topLeft() );
-
-    QWidget::resize(size);
 }
 
 void gui::UiOverlay::paintEvent( QPaintEvent* e )
@@ -240,5 +224,58 @@ void gui::UiOverlay::mousePressEvent( QMouseEvent* e )
                 break;
             }
         }
+    }
+}
+#include "guiUtil/VideoWidget.h"
+void gui::UiOverlay::resizeEvent( QResizeEvent* e )
+{
+    QWidget::resizeEvent(e);
+
+    qreal const buffer(10);
+
+    // Move the menu button
+    QRect menu( m_menu->rect() );
+    menu.moveTopRight( QPoint(e->size().width()-buffer, buffer) );
+    m_menu->move( menu.topLeft() );
+
+    // Move the load button
+    QRect load( m_load->rect() );
+    load.moveTopRight( QPoint(menu.left() - 2, buffer) );
+    m_load->move( load.topLeft() );
+
+    // Move the ldvd button
+    QRect ldvd( m_ldvd->rect() );
+    ldvd.moveTopRight( QPoint(load.left() - 2, buffer) );
+    m_ldvd->move( ldvd.topLeft() );
+
+    if ( m_videowidget )
+    {
+        gui::VideoWidget* videowidget( m_videowidget );
+        m_videowidget = 0;
+
+        QPoint dPos(videowidget->pos() - videowidget->geometry().topLeft());
+        if ( videowidget->pos() != ( pos() + dPos) )
+            videowidget->move( pos() + dPos );
+
+        if ( e->size() != videowidget->size() )
+            videowidget->resize(e->size());
+
+        m_videowidget = videowidget;
+    }
+}
+
+void gui::UiOverlay::moveEvent( QMoveEvent* e )
+{
+    QWidget::moveEvent(e);
+    if ( m_videowidget )
+    {
+        gui::VideoWidget* videowidget( m_videowidget );
+        m_videowidget = 0;
+
+        QPoint dPos(videowidget->pos() - videowidget->geometry().topLeft());
+        if ( videowidget->pos() != (e->pos() + dPos) )
+            videowidget->move( e->pos() + dPos );
+
+        m_videowidget = videowidget;
     }
 }

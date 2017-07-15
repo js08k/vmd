@@ -6,6 +6,7 @@
 
 namespace Ui { class UiOverlay; }
 namespace gui { class UiOverlay; }
+namespace gui { class VideoWidget; }
 class QPushButton;
 
 class gui::UiOverlay
@@ -15,11 +16,11 @@ class gui::UiOverlay
 public:
     UiOverlay(QWidget* parent = 0);
     ~UiOverlay();
+    void setVideoWidget( gui::VideoWidget* widget );
     inline void setActivate(std::function<void(dvd::MenuButton)>);
     inline void setHighlight(std::function<void(dvd::MenuButton)>);
     inline void setCursorIsActive(std::function<void()>);
 
-    void resize( QSize );
     void paintEvent( QPaintEvent* e );
 
     void setButtons( QList<dvd::MenuButton> const& );
@@ -38,6 +39,8 @@ signals:
 protected:
     void mouseMoveEvent( QMouseEvent* e );
     void mousePressEvent( QMouseEvent* e );
+    void resizeEvent( QResizeEvent* e );
+    void moveEvent( QMoveEvent* e );
 
 private slots:
     void menuToggled(bool);
@@ -58,6 +61,8 @@ private:
     QPushButton* m_menu;
 
     QList<dvd::MenuButton> m_buttons;
+
+    gui::VideoWidget* m_videowidget;
 };
 
 void gui::UiOverlay::setActivate(std::function<void(dvd::MenuButton)> fn)
